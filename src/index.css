@@ -1,0 +1,162 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: #f8fafc;
+    color: #1e293b;
+    line-height: 1.6;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+}
+
+@layer components {
+  /* Glass effect */
+  .glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .glass-dark {
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Card styles */
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-slate-100 p-6 transition-all duration-200;
+  }
+  .card:hover {
+    @apply shadow-md;
+  }
+
+  /* Button styles */
+  .btn-primary {
+    @apply bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-2.5 transition-all duration-200 inline-flex items-center justify-center gap-2 shadow-sm hover:shadow-md active:scale-[0.98];
+  }
+  .btn-secondary {
+    @apply border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium rounded-lg px-4 py-2.5 transition-all duration-200 inline-flex items-center justify-center gap-2 active:scale-[0.98];
+  }
+  .btn-success {
+    @apply bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-lg px-4 py-2.5 transition-all duration-200 inline-flex items-center justify-center gap-2 shadow-sm hover:shadow-md active:scale-[0.98];
+  }
+  .btn-danger {
+    @apply bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg px-4 py-2.5 transition-all duration-200 inline-flex items-center justify-center gap-2 shadow-sm hover:shadow-md active:scale-[0.98];
+  }
+
+  /* Badge styles */
+  .badge {
+    @apply rounded-full px-2.5 py-0.5 text-xs font-medium inline-flex items-center gap-1;
+  }
+  .badge-pending {
+    @apply bg-amber-50 text-amber-700 border border-amber-200;
+  }
+  .badge-approved {
+    @apply bg-emerald-50 text-emerald-700 border border-emerald-200;
+  }
+  .badge-completed {
+    @apply bg-blue-50 text-blue-700 border border-blue-200;
+  }
+  .badge-cancelled {
+    @apply bg-red-50 text-red-700 border border-red-200;
+  }
+
+  /* Input styles */
+  .input {
+    @apply w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white placeholder:text-slate-400;
+  }
+
+  /* Stat card */
+  .stat-card {
+    @apply bg-white rounded-xl p-5 border border-slate-100 shadow-sm;
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-emerald-500;
+  }
+
+  /* Waveform bars */
+  .waveform-bar {
+    @apply w-1 bg-blue-500 rounded-full transition-all;
+    animation: waveform 1.2s ease-in-out infinite;
+  }
+  .waveform-bar:nth-child(2) { animation-delay: 0.1s; }
+  .waveform-bar:nth-child(3) { animation-delay: 0.2s; }
+  .waveform-bar:nth-child(4) { animation-delay: 0.3s; }
+  .waveform-bar:nth-child(5) { animation-delay: 0.4s; }
+  .waveform-bar:nth-child(6) { animation-delay: 0.3s; }
+  .waveform-bar:nth-child(7) { animation-delay: 0.2s; }
+
+  /* Circular progress */
+  .circular-progress {
+    @apply relative inline-flex items-center justify-center;
+  }
+
+  /* Print styles for PDF export */
+  @media print {
+    .no-print {
+      display: none !important;
+    }
+    body {
+      background: white;
+    }
+    .card {
+      box-shadow: none;
+      border: 1px solid #e2e8f0;
+    }
+  }
+}
+
+@layer utilities {
+  .animate-delay-100 {
+    animation-delay: 100ms;
+  }
+  .animate-delay-200 {
+    animation-delay: 200ms;
+  }
+  .animate-delay-300 {
+    animation-delay: 300ms;
+  }
+  .animate-delay-400 {
+    animation-delay: 400ms;
+  }
+  .animate-delay-500 {
+    animation-delay: 500ms;
+  }
+}
