@@ -1,53 +1,127 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
-export const createOrGetUser = mutation({
-  args: {
-    clerkId: v.string(),
-    role: v.union(v.literal("doctor"), v.literal("patient")),
-    name: v.string(),
-    email: v.string(),
-    specialty: v.optional(v.string()),
-  },
+export const getUserByToken = query({
+  args: { tokenIdentifier: v.string() },
   handler: async (ctx, args) => {
-    const existing = await ctx.db
-      .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", args.clerkId))
-      .first();
+    // Get the user's identity from the auth context
+    const identity = await ctx.auth.getUserIdentity();
 
-    if (existing) {
-      return existing._id;
+    if (!identity) {
+      return null;
     }
 
+    // Check if we've already stored this identity before
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.subject))
+      .unique();
+
+    if (user !== null) {
+      return user;
+    }
+
+    return null;
+  },
+});
+
+export const getById = query({
+  args: { id: v.id("users") },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});
+
+export const createOrUpdateUser = mutation({
+  args: {
+    role: v.optional(v.union(v.literal("doctor"), v.literal("patient"))),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) {
+      return null;
+    }
+
+    // Check if user exists
+    const existingUser = await ctx.db
+      .query("users")
+      .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.subject))
+      .unique();
+
+    if (existingUser) {
+      // Update if needed
+      if (
+        existingUser.name !== identity.name ||
+        existingUser.email !== identity.email
+      ) {
+        await ctx.db.patch(existingUser._id, {
+          name: identity.name,
+          email: identity.email,
+        });
+      }
+      return existingUser;
+    }
+
+    // Create new user with role (default to patient if not specified)
     const userId = await ctx.db.insert("users", {
-      clerkId: args.clerkId,
-      role: args.role,
-      name: args.name,
-      email: args.email,
-      specialty: args.specialty,
-      conditions: [],
-      medications: [],
-      allergies: [],
-      createdAt: Date.now(),
+      name: identity.name,
+      email: identity.email,
+      tokenIdentifier: identity.subject,
+      role: args.role || "patient",
     });
 
-    return userId;
+    return await ctx.db.get(userId);
   },
 });
 
-export const getUser = query({
-  args: { clerkId: v.string() },
+export const updateUserRole = mutation({
+  args: {
+    role: v.union(v.literal("doctor"), v.literal("patient")),
+    specialization: v.optional(v.string()),
+    licenseNumber: v.optional(v.string()),
+    gender: v.optional(v.string()),
+    age: v.optional(v.number()),
+    dateOfBirth: v.optional(v.string()),
+    location: v.optional(v.string()),
+  },
   handler: async (ctx, args) => {
-    return await ctx.db
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+
+    const user = await ctx.db
       .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", args.clerkId))
-      .first();
+      .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.subject))
+      .unique();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const updateData: any = { role: args.role };
+
+    if (args.role === "doctor") {
+      if (args.specialization) updateData.specialization = args.specialization;
+      if (args.licenseNumber) updateData.licenseNumber = args.licenseNumber;
+    } else if (args.role === "patient") {
+      if (args.dateOfBirth) updateData.dateOfBirth = args.dateOfBirth;
+      if (args.gender) updateData.gender = args.gender;
+      if (args.age) updateData.age = args.age;
+      if (args.location) updateData.location = args.location;
+    }
+
+    await ctx.db.patch(user._id, updateData);
+    return await ctx.db.get(user._id);
   },
 });
 
+// Get all patients for doctor scheduling
 export const getAllPatients = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async (ctx, args) => {
     return await ctx.db
       .query("users")
       .withIndex("by_role", (q) => q.eq("role", "patient"))
@@ -55,43 +129,65 @@ export const getAllPatients = query({
   },
 });
 
-export const getAllDoctors = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db
-      .query("users")
-      .withIndex("by_role", (q) => q.eq("role", "doctor"))
-      .collect();
+// Get multiple users by their IDs
+export const getUsersByIds = query({
+  args: { ids: v.array(v.id("users")) },
+  handler: async (ctx, args) => {
+    const users = await Promise.all(args.ids.map((id) => ctx.db.get(id)));
+    return users.filter(Boolean); // Remove any null results
   },
 });
 
-export const updateProfile = mutation({
+// Update basic medical information
+export const updateBasicMedicalInfo = mutation({
   args: {
-    clerkId: v.string(),
-    name: v.optional(v.string()),
-    specialty: v.optional(v.string()),
-    conditions: v.optional(v.array(v.string())),
+    patientId: v.id("users"),
+    conditions: v.optional(
+      v.array(
+        v.object({
+          name: v.string(),
+          severity: v.union(
+            v.literal("mild"),
+            v.literal("moderate"),
+            v.literal("severe")
+          ),
+        })
+      )
+    ),
     medications: v.optional(v.array(v.string())),
     allergies: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", args.clerkId))
-      .first();
-
-    if (!user) {
-      throw new Error("User not found");
+    const user = await ctx.db.get(args.patientId);
+    if (!user || user.role !== "patient") {
+      throw new Error("Patient not found");
     }
 
-    const updates: Record<string, unknown> = {};
-    if (args.name !== undefined) updates.name = args.name;
-    if (args.specialty !== undefined) updates.specialty = args.specialty;
-    if (args.conditions !== undefined) updates.conditions = args.conditions;
-    if (args.medications !== undefined) updates.medications = args.medications;
-    if (args.allergies !== undefined) updates.allergies = args.allergies;
+    const updateData: any = {};
+    if (args.conditions !== undefined) updateData.conditions = args.conditions;
+    if (args.medications !== undefined)
+      updateData.medications = args.medications;
+    if (args.allergies !== undefined) updateData.allergies = args.allergies;
 
-    await ctx.db.patch(user._id, updates);
-    return user._id;
+    await ctx.db.patch(args.patientId, updateData);
+    return await ctx.db.get(args.patientId);
+  },
+});
+
+export const getCurrentUser = query({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) {
+      return null;
+    }
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.subject))
+      .unique();
+
+    return user;
   },
 });

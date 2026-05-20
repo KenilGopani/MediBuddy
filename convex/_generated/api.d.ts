@@ -8,58 +8,49 @@
  * @module
  */
 
-import type * as actions_matchTrials from "../actions/matchTrials.js";
-import type * as actions_summarize from "../actions/summarize.js";
-import type * as actions_transcribeAudio from "../actions/transcribeAudio.js";
-import type * as appointments from "../appointments.js";
-import type * as consent from "../consent.js";
-import type * as summaries from "../summaries.js";
-import type * as transcripts from "../transcripts.js";
-import type * as trialMatches from "../trialMatches.js";
-import type * as users from "../users.js";
-
 import type {
   ApiFromModules,
   FilterApi,
   FunctionReference,
 } from "convex/server";
-
-declare const fullApi: ApiFromModules<{
-  "actions/matchTrials": typeof actions_matchTrials;
-  "actions/summarize": typeof actions_summarize;
-  "actions/transcribeAudio": typeof actions_transcribeAudio;
-  appointments: typeof appointments;
-  consent: typeof consent;
-  summaries: typeof summaries;
-  transcripts: typeof transcripts;
-  trialMatches: typeof trialMatches;
-  users: typeof users;
-}>;
+import type * as asi1 from "../asi1.js";
+import type * as audio from "../audio.js";
+import type * as clinicalTrials from "../clinicalTrials.js";
+import type * as consultations from "../consultations.js";
+import type * as medicalEntityExtraction from "../medicalEntityExtraction.js";
+import type * as medicalProfile from "../medicalProfile.js";
+import type * as medicalReports from "../medicalReports.js";
+import type * as meetings from "../meetings.js";
+import type * as notifications from "../notifications.js";
+import type * as trialMatching from "../trialMatching.js";
+import type * as users from "../users.js";
 
 /**
- * A utility for referencing Convex functions in your app's public API.
+ * A utility for referencing Convex functions in your app's API.
  *
  * Usage:
  * ```js
  * const myFunctionReference = api.myModule.myFunction;
  * ```
  */
+declare const fullApi: ApiFromModules<{
+  asi1: typeof asi1;
+  audio: typeof audio;
+  clinicalTrials: typeof clinicalTrials;
+  consultations: typeof consultations;
+  medicalEntityExtraction: typeof medicalEntityExtraction;
+  medicalProfile: typeof medicalProfile;
+  medicalReports: typeof medicalReports;
+  meetings: typeof meetings;
+  notifications: typeof notifications;
+  trialMatching: typeof trialMatching;
+  users: typeof users;
+}>;
 export declare const api: FilterApi<
   typeof fullApi,
   FunctionReference<any, "public">
 >;
-
-/**
- * A utility for referencing Convex functions in your app's internal API.
- *
- * Usage:
- * ```js
- * const myFunctionReference = internal.myModule.myFunction;
- * ```
- */
 export declare const internal: FilterApi<
   typeof fullApi,
   FunctionReference<any, "internal">
 >;
-
-export declare const components: {};

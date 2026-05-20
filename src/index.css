@@ -1,162 +1,76 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-
 @tailwind base;
-@tailwind components;
-@tailwind utilities;
+  @tailwind components;
+  @tailwind utilities;
 
-@layer base {
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
+  @layer base {
+    :root {
+      --background: 0 0% 100%;
+      --foreground: 222.2 84% 4.9%;
 
-  html {
-    scroll-behavior: smooth;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
+      --card: 0 0% 100%;
+      --card-foreground: 222.2 84% 4.9%;
 
-  body {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    background-color: #f8fafc;
-    color: #1e293b;
-    line-height: 1.6;
-  }
+      --popover: 0 0% 100%;
+      --popover-foreground: 222.2 84% 4.9%;
 
-  /* Custom scrollbar */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 3px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-  }
-}
+      --primary: 222.2 47.4% 11.2%;
+      --primary-foreground: 210 40% 98%;
 
-@layer components {
-  /* Glass effect */
-  .glass {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-  }
+      --secondary: 210 40% 96.1%;
+      --secondary-foreground: 222.2 47.4% 11.2%;
 
-  .glass-dark {
-    background: rgba(15, 23, 42, 0.8);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
+      --muted: 210 40% 96.1%;
+      --muted-foreground: 215.4 16.3% 46.9%;
 
-  /* Card styles */
-  .card {
-    @apply bg-white rounded-xl shadow-sm border border-slate-100 p-6 transition-all duration-200;
-  }
-  .card:hover {
-    @apply shadow-md;
-  }
+      --accent: 210 40% 96.1%;
+      --accent-foreground: 222.2 47.4% 11.2%;
 
-  /* Button styles */
-  .btn-primary {
-    @apply bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-2.5 transition-all duration-200 inline-flex items-center justify-center gap-2 shadow-sm hover:shadow-md active:scale-[0.98];
-  }
-  .btn-secondary {
-    @apply border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium rounded-lg px-4 py-2.5 transition-all duration-200 inline-flex items-center justify-center gap-2 active:scale-[0.98];
-  }
-  .btn-success {
-    @apply bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-lg px-4 py-2.5 transition-all duration-200 inline-flex items-center justify-center gap-2 shadow-sm hover:shadow-md active:scale-[0.98];
-  }
-  .btn-danger {
-    @apply bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg px-4 py-2.5 transition-all duration-200 inline-flex items-center justify-center gap-2 shadow-sm hover:shadow-md active:scale-[0.98];
+      --destructive: 0 84.2% 60.2%;
+      --destructive-foreground: 210 40% 98%;
+
+      --border: 214.3 31.8% 91.4%;
+      --input: 214.3 31.8% 91.4%;
+      --ring: 222.2 84% 4.9%;
+
+      --radius: 0.5rem;
+    }
+
+    .dark {
+      --background: 222.2 84% 4.9%;
+      --foreground: 210 40% 98%;
+
+      --card: 222.2 84% 4.9%;
+      --card-foreground: 210 40% 98%;
+
+      --popover: 222.2 84% 4.9%;
+      --popover-foreground: 210 40% 98%;
+
+      --primary: 210 40% 98%;
+      --primary-foreground: 222.2 47.4% 11.2%;
+
+      --secondary: 217.2 32.6% 17.5%;
+      --secondary-foreground: 210 40% 98%;
+
+      --muted: 217.2 32.6% 17.5%;
+      --muted-foreground: 215 20.2% 65.1%;
+
+      --accent: 217.2 32.6% 17.5%;
+      --accent-foreground: 210 40% 98%;
+
+      --destructive: 0 62.8% 30.6%;
+      --destructive-foreground: 210 40% 98%;
+
+      --border: 217.2 32.6% 17.5%;
+      --input: 217.2 32.6% 17.5%;
+      --ring: 212.7 26.8% 83.9%;
+    }
   }
 
-  /* Badge styles */
-  .badge {
-    @apply rounded-full px-2.5 py-0.5 text-xs font-medium inline-flex items-center gap-1;
-  }
-  .badge-pending {
-    @apply bg-amber-50 text-amber-700 border border-amber-200;
-  }
-  .badge-approved {
-    @apply bg-emerald-50 text-emerald-700 border border-emerald-200;
-  }
-  .badge-completed {
-    @apply bg-blue-50 text-blue-700 border border-blue-200;
-  }
-  .badge-cancelled {
-    @apply bg-red-50 text-red-700 border border-red-200;
-  }
-
-  /* Input styles */
-  .input {
-    @apply w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white placeholder:text-slate-400;
-  }
-
-  /* Stat card */
-  .stat-card {
-    @apply bg-white rounded-xl p-5 border border-slate-100 shadow-sm;
-  }
-
-  /* Gradient text */
-  .gradient-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-emerald-500;
-  }
-
-  /* Waveform bars */
-  .waveform-bar {
-    @apply w-1 bg-blue-500 rounded-full transition-all;
-    animation: waveform 1.2s ease-in-out infinite;
-  }
-  .waveform-bar:nth-child(2) { animation-delay: 0.1s; }
-  .waveform-bar:nth-child(3) { animation-delay: 0.2s; }
-  .waveform-bar:nth-child(4) { animation-delay: 0.3s; }
-  .waveform-bar:nth-child(5) { animation-delay: 0.4s; }
-  .waveform-bar:nth-child(6) { animation-delay: 0.3s; }
-  .waveform-bar:nth-child(7) { animation-delay: 0.2s; }
-
-  /* Circular progress */
-  .circular-progress {
-    @apply relative inline-flex items-center justify-center;
-  }
-
-  /* Print styles for PDF export */
-  @media print {
-    .no-print {
-      display: none !important;
+  @layer base {
+    * {
+      @apply border-border;
     }
     body {
-      background: white;
-    }
-    .card {
-      box-shadow: none;
-      border: 1px solid #e2e8f0;
+      @apply bg-background text-foreground;
     }
   }
-}
-
-@layer utilities {
-  .animate-delay-100 {
-    animation-delay: 100ms;
-  }
-  .animate-delay-200 {
-    animation-delay: 200ms;
-  }
-  .animate-delay-300 {
-    animation-delay: 300ms;
-  }
-  .animate-delay-400 {
-    animation-delay: 400ms;
-  }
-  .animate-delay-500 {
-    animation-delay: 500ms;
-  }
-}

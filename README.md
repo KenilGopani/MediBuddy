@@ -1,101 +1,195 @@
-# MediBuddy — AI-Powered Clinical Trial Matching Platform
+# MediBuddy AI
 
-**Empowering Doctors, Guiding Patients**
+An AI-powered medical consultation and clinical trial matching platform that connects doctors and patients through intelligent healthcare technology.
 
-Automate clinical trial matching by transcribing doctor-patient conversations, extracting medical data, and connecting patients with relevant trials in real-time.
+## Overview
 
----
+MediBuddy AI provides a comprehensive healthcare platform with:
 
-## Features
+- **AI-Powered Consultations** - Real-time audio transcription and medical entity extraction during doctor-patient consultations
+- **Clinical Trial Matching** - Intelligent matching of patients to relevant clinical trials based on their medical conditions
+- **Secure Authentication** - HIPAA-compliant user management with role-based access for doctors and patients
+- **Real-time Database** - Live updates and notifications for trial matches, appointments, and consultation records
+- **Audio Processing** - Advanced speech-to-text capabilities for medical consultations with entity recognition
 
-- Real-time Audio Transcription — Record consultations with Groq Whisper
-- AI Medical Data Extraction — Structured extraction via Google Gemini
-- Autonomous Trial Matching — ASI-1 simulated agent finds relevant clinical trials
-- Doctor Dashboard — Manage consultations, review trial matches, schedule appointments
-- Patient Dashboard — View reports, explore trial suggestions, manage consent
-- Role-Based Access — Clerk authentication with doctor/patient separation
-- Real-time Updates — Convex reactive queries for live data
-- Consent Management — Full informed consent workflow with audit logging
-- Demo Mode — Fully functional UI with mock data when no API keys are set
+## Key Features
 
-## Tech Stack
+- **Doctor Dashboard** - Manage patients, schedule appointments, conduct consultations, and review trial matches
+- **Patient Portal** - View notifications, manage appointments, and track clinical trial participation
+- **Medical Entity Extraction** - Automatically identify and categorize medical conditions, medications, and vital signs from consultation transcripts
+- **Trial Matching Algorithm** - AI-driven matching system that connects patients with relevant clinical trials
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | React 18 + TypeScript + Tailwind CSS 3 |
-| Build Tool | Vite |
-| Backend | Convex (serverless + real-time DB) |
-| Auth | Clerk (role-based) |
-| Transcription | Groq Whisper API |
-| AI | Google Gemini API |
-| Icons | Lucide React |
+## Technology Stack
 
-## Prerequisites
+- **Frontend** - Vite + React + TypeScript for modern, fast development
+- **Authentication** - Clerk for secure user management
+- **Database** - Convex for real-time data synchronization
+- **UI Components** - Tailwind CSS + Radix UI for accessible, modern design
+- **Audio Processing** - Web Audio API for real-time transcription
 
-- Node.js 18+ and npm
-- Convex account (free) — https://convex.dev
-- Clerk account (free) — https://clerk.com
-- Groq API key (free) — https://console.groq.com
-- Google AI Studio API key — https://aistudio.google.com
+## Setup & Installation 🚀
 
-> All API keys are optional. The app runs in demo mode with mock data.
+### Prerequisites
 
-## Quick Start
+- Node.js (v18 or higher)
+- npm or yarn
 
-### 1. Install
+### 1. Clone the repository
 
 ```bash
-cd MediBuddy
+git clone <repository-url>
+cd MediBuddy-AI
+```
+
+### 2. Install dependencies
+
+```bash
 npm install
 ```
 
-### 2. Start Convex Backend
+### 3. Environment Setup
+
+Copy the environment variables template and fill in your API keys:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` with your actual API keys:
+
+```bash
+# Convex Configuration
+CONVEX_DEPLOYMENT=your_convex_deployment_url
+VITE_CONVEX_URL=your_convex_url
+
+# Authentication
+CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+CLERK_SECRET_KEY=your_clerk_secret_key
+
+# AI Services
+OPENAI_API_KEY=your_openai_api_key
+GOOGLE_GEMINI_API_KEY=your_gemini_api_key
+
+# ASI1 Integration (fetch.ai)
+ASI1_API_KEY=your_asi1_api_key_here
+ASI1_BASE_URL=https://api.asi1.ai
+ASI1_MODEL=asi1-mini
+
+# ClinicalTrials.gov API
+CLINICAL_TRIALS_BASE_URL=https://clinicaltrials.gov/api/v2
+```
+
+### 4. Run the Backend (Convex)
+
+In one terminal, start the Convex backend:
 
 ```bash
 npx convex dev
 ```
 
-### 3. Start Frontend
+### 5. Run the Frontend
+
+In another terminal, start the development server:
 
 ```bash
 npm run dev
 ```
 
-Visit http://localhost:5173
+The application will be available at `http://localhost:5173`
 
-### 4. Configure API Keys (Optional)
+## Inspiration 🧠 
 
-Edit `.env.local`:
+Every year, thousands of clinical trials go under-enrolled, not because patients are unwilling, but because they’re unaware. Doctors often don’t have time to search eligibility criteria or explain options during short appointments, they also have on additional overhead of taking notes of the medical history of patients during the visit. We asked ourselves:  
+**What if trial matching could happen automatically in the background during a normal doctor visit?**
 
-```env
-VITE_CLERK_PUBLISHABLE_KEY=pk_test_...
-CLERK_SECRET_KEY=sk_test_...
-VITE_CONVEX_URL=http://127.0.0.1:3210
-GROQ_API_KEY=gsk_...
-GEMINI_API_KEY=AIza...
-```
+That question led us to build **MediBuddy** - an autonomous, privacy-first platform that turns doctor-patient conversations into life-saving trial opportunities.
 
-### 5. Configure Clerk (Optional)
+---
 
-1. Create Clerk app at clerk.com
-2. Enable Convex integration
-3. Update `convex/auth.config.ts` with your Clerk domain
-4. Set env var: `npx convex env set CLERK_JWT_ISSUER_DOMAIN "https://your-app.clerk.accounts.dev"`
+## What it does 💡
 
-## Demo Mode
+**MediBuddy** listens to doctor-patient appointments via voice, transcribes the conversation in real-time, structures the medical information, generates a report, and uses autonomous agents to match patients with relevant clinical trials. If a match is found, the patient can securely consent to share limited data with the sponsor  all without leaving the app. 
 
-When API keys are not configured, the app runs with mock data:
-- Authentication bypassed — switch between Doctor/Patient views
-- Mock consultation transcript
-- Mock medical data extraction
-- 5 realistic clinical trials with NCT-style IDs
+The platform supports:
 
-## Deployment
+- 📅 **Appointment Booking** (with doctor approval)
+- 🎙️ **Speech-to-text Transcription** (via Groq (Whisper v3 Large Turbo))
+- 🧾 **Summarization and Structuring** (via Google Gemini)
+- 🧬 **Clinical Trial Matching via AI Agents** (ASI-1 by Fetch.ai)
+- ✅ **Consent Management** for trials
+- 🧑‍⚕️ **Role-based Dashboards** for Doctors and Patients
 
-**Frontend (Vercel):** `npm run build` then deploy `dist/`
+---
 
-**Backend (Convex Cloud):** `npx convex deploy`
+## How we built it 🛠️
 
-## License
+We began by designing user flows for both patients and doctors to make sure the system felt simple, secure, and intuitive. Once the core flows were clear, we:
 
-MIT
+- Built the **frontend using React + Typescript + Tailwind CSS**, with a dynamic dashboard for both roles
+- Used **Convex** for the backend and database to power real-time data, user roles, and appointment logic
+- Integrated **Groq’s API(Whisper v3 Large Turbo)** to transcribe voice input during doctor appointments
+- Passed transcriptions to **Google Gemini** to generate structured summaries (conditions, age, comorbidities, etc.)
+- Used **ASI-1 SDK** by **Fetch.ai** to simulate sponsor agents and match trials based on extracted patient data
+- Designed a **consent interface** where patients explicitly approve before data is sent to sponsor agents
+- Deployed the full app to **Vercel** for fast and easy hosting
+
+We built MediBuddy to prove that even complex, regulated workflows like trial enrollment can be simplified with the right blend of AI, agent systems, and thoughtful UX.
+
+---
+###  Key Features Implemented 🧱
+- **Auth system** for Patients and Doctors
+- **Doctor dashboard** to manage appointment requests and suggest trials
+- **Patient dashboard** to review transcripts, summaries/reports, and suggested trials
+- **Speech capture** from doctor interactions, transcribed and summarized
+- **Structured data extraction** for trial matching
+- **Agent-based communication** for querying trial sponsors
+- **Consent flow** that notifies sponsors upon patient approval
+
+---
+
+## Challenges we ran into 🤯
+
+
+- **Agent interoperability**: Designing a flexible message format for Fetch.ai agents to exchange patient-trial matching data while preserving privacy was tricky.
+- **On-device vs. API trade-offs**: We wanted to minimize cloud-based PII(Personally Identifiable Information) exposure, so we had to carefully architect our pipeline to process transcription and summarization securely.
+- **Natural language variability**: Doctor conversations are unstructured, turning them into structured trial-relevant data was challenging. We fine-tuned prompt strategies for Gemini to extract accurate conditions, age, and comorbidities.
+- **Convex learning curve**: Convex’s serverless model and schema system were powerful but took some iteration to model complex relationships like appointments, consent, and role-based access correctly.
+
+---
+## Accomplishments that we're proud of 🏆
+
+- Built a fully functional end-to-end prototype in under 24 hours
+- Successfully integrated **voice transcription (Whisper)** with **structured summarization (Gemini)**
+- Designed and implemented a **real-time doctor-patient workflow** with Convex’s reactive backend
+- Created an **agent-based trial matching system** using ASI-1 SDK by Fetch.ai
+- Preserved **privacy-first data flows** with patient-controlled consent
+- Designed an intuitive UI for both patients and doctors using React + Tailwind CSS
+- Simulated a real-world clinical use case with minimal friction for the end user
+
+---
+
+## What we learned 📚
+
+- **Voice is a powerful interface** , it lowers the barrier to data collection and enables richer insights, especially in clinical contexts.
+- **AI agents + human interfaces** can work in harmony. We built trust-first experiences by keeping the user in control (e.g., explicit consent before trial sharing).
+- **Convex is great for rapid prototyping** :  real-time updates, integrated database, and strong typing helped us move fast once we were over the initial learning curve.
+- **Healthcare UX matters**, we focused on keeping flows intuitive, secure, and frictionless, especially for sensitive actions like consent and data sharing.
+
+---
+## What's next for MediBuddy 🔮
+
+- 🧬 **Custom agent logic** for more nuanced trial filtering (e.g., co-morbidities, stage-specific trials)
+- 🔐 **Biometric consent mechanisms** (e.g., voice or face verification)
+- 📈 **Doctor-side analytics dashboard** for trial recommendation insights
+- 🎁 **Token-based reward system** for trial participation and consent engagement
+- ☁️ Optional encrypted backup using IPFS for decentralized storage of summaries and transcripts
+
+---
+## The Impact 🌟
+
+With **MediBuddy**, we hope to:
+- **Make clinical trials more accessible** , especially for patients who never knew they qualified
+- **Reduce doctor workload** by enabling passive trial discovery and transcription & summarization of the conversation.
+- **Push forward agent-based automation** in a space where trust and privacy are paramount
+
+ We believe MediBuddy is not just a hackathon project,  it's a real step toward bringing **AI-powered clinical access** into everyday care.
