@@ -473,7 +473,7 @@ export function ASI1TrialMatching({
       case "high":
         return "text-red-600";
       default:
-        return "text-gray-600";
+        return "text-muted-foreground";
     }
   };
 
@@ -494,7 +494,7 @@ export function ASI1TrialMatching({
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Brain className="h-5 w-5 text-blue-600" />
+            <Brain className="h-5 w-5 text-primary" />
             ASI1 Enhanced Clinical Trial Matching
           </CardTitle>
           <CardDescription>
@@ -551,7 +551,7 @@ export function ASI1TrialMatching({
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-purple-600" />
+              <TrendingUp className="h-5 w-5 text-accent-foreground" />
               ASI1 Medical Analysis
             </CardTitle>
           </CardHeader>
@@ -587,7 +587,7 @@ export function ASI1TrialMatching({
 
             <div>
               <h4 className="font-semibold mb-2">ASI1 Reasoning</h4>
-              <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
+              <p className="text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
                 {asi1Enhancement.reasoning}
               </p>
             </div>
@@ -649,7 +649,7 @@ export function ASI1TrialMatching({
                                     href={`https://clinicaltrials.gov/study/${trial.nctId}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-[#0066CC] hover:underline inline-flex items-center"
+                                    className="text-primary hover:underline inline-flex items-center"
                                   >
                                     {trial.nctId}
                                     <ExternalLink className="h-3 w-3 ml-1" />
@@ -677,7 +677,7 @@ export function ASI1TrialMatching({
                         </div>
                       </CardHeader>
                       <CardContent>
-                        <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                        <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
                           {trial.description}
                         </p>
 
@@ -735,7 +735,7 @@ export function ASI1TrialMatching({
                                   return (
                                     <Badge
                                       variant="default"
-                                      className="bg-blue-100 text-blue-800 border-blue-200"
+                                      className="bg-primary/10 text-primary border-primary/25"
                                     >
                                       <CheckCircle className="h-3 w-3 mr-1" />
                                       Enrolled
@@ -852,7 +852,7 @@ export function ASI1TrialMatching({
                                 <li key={idx}>{location}</li>
                               ))}
                             {trial.locations.length > 3 && (
-                              <li className="text-gray-500">
+                              <li className="text-muted-foreground">
                                 +{trial.locations.length - 3} more locations
                               </li>
                             )}
@@ -862,7 +862,7 @@ export function ASI1TrialMatching({
 
                       <div>
                         <h4 className="font-semibold mb-2">Description</h4>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-muted-foreground">
                           {trial.description}
                         </p>
                       </div>
@@ -1002,7 +1002,7 @@ export function ASI1TrialMatching({
                                 return (
                                   <Badge
                                     variant="default"
-                                    className="bg-blue-100 text-blue-800 border-blue-200"
+                                    className="bg-primary/10 text-primary border-primary/25"
                                   >
                                     <CheckCircle className="h-4 w-4 mr-1" />
                                     Patient Enrolled
@@ -1020,7 +1020,7 @@ export function ASI1TrialMatching({
                                         <Clock className="h-4 w-4 mr-1" />
                                         Pending Doctor Review
                                       </Badge>
-                                      <p className="text-sm text-gray-600">
+                                      <p className="text-sm text-muted-foreground">
                                         Your doctor needs to review this trial
                                         before you can sign consent.
                                       </p>
@@ -1090,9 +1090,9 @@ export function ASI1TrialMatching({
       {!isSearching && allTrials.length === 0 && (
         <Card>
           <CardContent className="text-center py-8">
-            <Search className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">No Trials Available</h3>
-            <p className="text-gray-600 mb-4">
+            <p className="text-muted-foreground mb-4">
               No clinical trials found for this consultation. Search for
               real-time trials to find matching studies.
             </p>

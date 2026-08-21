@@ -176,7 +176,7 @@ const TranscriptionDisplay = ({
       if (entities.medications?.length) {
         processEntities(
           entities.medications,
-          "bg-blue-100 text-blue-800 rounded px-1"
+          "bg-primary/10 text-primary rounded px-1"
         );
       }
 
@@ -190,7 +190,7 @@ const TranscriptionDisplay = ({
       if (entities.symptoms?.length) {
         processEntities(
           entities.symptoms,
-          "bg-purple-100 text-purple-800 rounded px-1"
+          "bg-accent text-accent-foreground rounded px-1"
         );
       }
 
@@ -322,11 +322,11 @@ const TranscriptionDisplay = ({
         <CardContent>
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
-              <Clock className="h-12 w-12 text-blue-500 mb-2 mx-auto animate-pulse" />
-              <p className="text-lg text-gray-700">
+              <Clock className="h-12 w-12 text-primary mb-2 mx-auto animate-pulse" />
+              <p className="text-lg text-muted-foreground">
                 Please wait while we process your recording
               </p>
-              <p className="text-sm text-gray-500 mt-2">
+              <p className="text-sm text-muted-foreground mt-2">
                 This may take a few minutes depending on the length of the
                 recording
               </p>
@@ -397,7 +397,7 @@ const TranscriptionDisplay = ({
             </div>
           ) : (
             <div className="space-y-3">
-              <div className="bg-gray-50 p-4 rounded-md min-h-[300px] whitespace-pre-wrap">
+              <div className="bg-muted/50 p-4 rounded-md min-h-[300px] whitespace-pre-wrap">
                 {highlightedText ? (
                   <div dangerouslySetInnerHTML={{ __html: highlightedText }} />
                 ) : (
@@ -405,7 +405,7 @@ const TranscriptionDisplay = ({
                 )}
               </div>
               <div className="flex justify-between items-center">
-                <div className="text-sm text-gray-500">
+                <div className="text-sm text-muted-foreground">
                   {consultation?.transcription?.length || 0} characters
                 </div>
                 <div className="flex space-x-2">

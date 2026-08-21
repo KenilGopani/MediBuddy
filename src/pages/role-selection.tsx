@@ -70,21 +70,21 @@ export default function RoleSelection() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FBFBFD]">
+    <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       <main className="flex-grow flex items-center justify-center py-16">
         <div className="container mx-auto px-4 max-w-2xl">
           <div className="text-center mb-8">
             <div className="flex justify-center mb-6">
-              <Logo size={64} className="drop-shadow-lg" />
+              <Logo size={56} />
             </div>
-            <h1 className="text-3xl font-semibold text-[#1D1D1F] mb-4">
+            <h1 className="text-4xl font-extrabold text-foreground mb-4">
               Welcome to MediBuddy AI
             </h1>
-            <p className="text-lg text-[#86868B] mb-4">
+            <p className="text-lg text-muted-foreground mb-4">
               Please select your role to get started with the platform.
             </p>
-            <div className="bg-blue-50 text-blue-700 p-4 rounded-lg text-left mb-6">
+            <div className="bg-accent text-accent-foreground p-4 rounded-lg text-left mb-6">
               <p className="text-base mb-2 font-medium">
                 One more step to complete your registration
               </p>
@@ -100,14 +100,14 @@ export default function RoleSelection() {
             <Card
               className={`cursor-pointer transition-all hover:shadow-lg ${
                 selectedRole === "doctor"
-                  ? "ring-2 ring-[#0066CC] bg-[#0066CC]/5"
+                  ? "ring-2 ring-primary bg-primary/5"
                   : ""
               }`}
               onClick={() => setSelectedRole("doctor")}
             >
               <CardHeader className="text-center">
-                <div className="mx-auto mb-4 p-3 rounded-full bg-[#0066CC]/10">
-                  <Stethoscope className="h-8 w-8 text-[#0066CC]" />
+                <div className="mx-auto mb-4 p-3 rounded-xl bg-primary/10">
+                  <Stethoscope className="h-8 w-8 text-primary" />
                 </div>
                 <CardTitle>I'm a Doctor</CardTitle>
                 <CardDescription>
@@ -120,14 +120,14 @@ export default function RoleSelection() {
             <Card
               className={`cursor-pointer transition-all hover:shadow-lg ${
                 selectedRole === "patient"
-                  ? "ring-2 ring-[#0066CC] bg-[#0066CC]/5"
+                  ? "ring-2 ring-primary bg-primary/5"
                   : ""
               }`}
               onClick={() => setSelectedRole("patient")}
             >
               <CardHeader className="text-center">
-                <div className="mx-auto mb-4 p-3 rounded-full bg-[#0066CC]/10">
-                  <User className="h-8 w-8 text-[#0066CC]" />
+                <div className="mx-auto mb-4 p-3 rounded-xl bg-primary/10">
+                  <User className="h-8 w-8 text-primary" />
                 </div>
                 <CardTitle>I'm a Patient</CardTitle>
                 <CardDescription>
@@ -270,7 +270,7 @@ export default function RoleSelection() {
             <Button
               onClick={handleRoleSubmit}
               disabled={!selectedRole || isLoading}
-              className="h-12 px-8 text-base rounded-[14px] bg-[#0066CC] hover:bg-[#0077ED] text-white"
+              size="lg" className="h-12 px-8 text-base"
             >
               {isLoading ? (
                 "Setting up your account..."

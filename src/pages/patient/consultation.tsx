@@ -75,14 +75,14 @@ export default function PatientConsultation() {
   // Check if user has access to this consultation
   if (consultation && userData && consultation.patientId !== userData._id) {
     return (
-      <div className="min-h-screen flex flex-col bg-[#FBFBFD]">
+      <div className="min-h-screen flex flex-col bg-background">
         <Navbar />
         <main className="flex-grow flex items-center justify-center">
           <div className="text-center max-w-md mx-auto p-6">
-            <h1 className="text-2xl font-semibold text-[#1D1D1F] mb-4">
+            <h1 className="text-2xl font-semibold text-foreground mb-4">
               Access Denied
             </h1>
-            <p className="text-gray-600 mb-6">
+            <p className="text-muted-foreground mb-6">
               You don't have permission to view this consultation.
             </p>
             <Button onClick={() => navigate("/patient/dashboard")}>
@@ -98,14 +98,14 @@ export default function PatientConsultation() {
   // Check if consultation has been shared
   if (consultation && !consultation.sharedWithPatient) {
     return (
-      <div className="min-h-screen flex flex-col bg-[#FBFBFD]">
+      <div className="min-h-screen flex flex-col bg-background">
         <Navbar />
         <main className="flex-grow flex items-center justify-center">
           <div className="text-center max-w-md mx-auto p-6">
-            <h1 className="text-2xl font-semibold text-[#1D1D1F] mb-4">
+            <h1 className="text-2xl font-semibold text-foreground mb-4">
               Report Not Available
             </h1>
-            <p className="text-gray-600 mb-6">
+            <p className="text-muted-foreground mb-6">
               This consultation report has not been shared with you yet. Please
               contact your doctor.
             </p>
@@ -120,7 +120,7 @@ export default function PatientConsultation() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FBFBFD]">
+    <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-6">
@@ -131,7 +131,7 @@ export default function PatientConsultation() {
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate("/patient/dashboard")}
-                className="text-gray-600 hover:text-gray-900"
+                className="text-muted-foreground hover:text-foreground"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Dashboard
@@ -142,7 +142,7 @@ export default function PatientConsultation() {
                 variant="outline"
                 size="sm"
                 onClick={handleDownloadReport}
-                className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                className="text-primary border-primary hover:bg-primary/5"
               >
                 <Download className="h-4 w-4 mr-2" />
                 Download Report
@@ -151,12 +151,12 @@ export default function PatientConsultation() {
           </div>
 
           {/* Title */}
-          <h1 className="text-3xl font-semibold text-[#1D1D1F] mb-4">
+          <h1 className="text-4xl font-extrabold text-foreground mb-4">
             Medical Consultation Report
           </h1>
 
           {/* Consultation Info */}
-          <div className="mb-6 text-gray-600">
+          <div className="mb-6 text-muted-foreground">
             <span className="font-medium">Doctor:</span>{" "}
             {doctor?.name || "Loading..."}
             {consultation?.startTime && (
@@ -173,8 +173,8 @@ export default function PatientConsultation() {
                 consultation?.status === "completed"
                   ? "text-green-600"
                   : consultation?.status === "active"
-                    ? "text-blue-600"
-                    : "text-gray-600"
+                    ? "text-primary"
+                    : "text-muted-foreground"
               }`}
             >
               {consultation?.status || "Loading..."}
@@ -214,10 +214,10 @@ export default function PatientConsultation() {
 
                 <TabsContent value="medical-report" className="space-y-6">
                   {/* Medical Report Section */}
-                  <Card className="bg-white">
+                  <Card className="bg-card">
                     <CardHeader>
                       <CardTitle className="flex items-center space-x-2">
-                        <FileText className="h-5 w-5 text-[#0066CC]" />
+                        <FileText className="h-5 w-5 text-primary" />
                         <span>Medical Report</span>
                       </CardTitle>
                     </CardHeader>
@@ -233,10 +233,10 @@ export default function PatientConsultation() {
 
                 <TabsContent value="medical-entities" className="space-y-6">
                   {/* Medical Entities Section */}
-                  <Card className="bg-white">
+                  <Card className="bg-card">
                     <CardHeader>
                       <CardTitle className="flex items-center space-x-2">
-                        <Stethoscope className="h-5 w-5 text-[#0066CC]" />
+                        <Stethoscope className="h-5 w-5 text-primary" />
                         <span>Medical Details</span>
                       </CardTitle>
                     </CardHeader>

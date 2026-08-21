@@ -213,7 +213,7 @@ export default function DoctorConsultation() {
   const patientName = patient?.name || "Darshan Arunbhai Patel"; // Fallback to sample name
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FBFBFD]">
+    <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-6">
@@ -224,7 +224,7 @@ export default function DoctorConsultation() {
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate("/doctor/dashboard")}
-                className="text-gray-600 hover:text-gray-900"
+                className="text-muted-foreground hover:text-foreground"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Dashboard
@@ -236,7 +236,7 @@ export default function DoctorConsultation() {
               className={
                 consultation?.sharedWithPatient
                   ? "text-green-600 border-green-600 hover:bg-green-50"
-                  : "text-blue-600 border-blue-600 hover:bg-blue-50"
+                  : "text-primary border-primary hover:bg-primary/5"
               }
               onClick={handleShareWithPatient}
               disabled={isSharing || !consultation?.medicalReport}
@@ -255,12 +255,12 @@ export default function DoctorConsultation() {
           </div>
 
           {/* Title */}
-          <h1 className="text-3xl font-semibold text-[#1D1D1F] mb-4">
+          <h1 className="text-4xl font-extrabold text-foreground mb-4">
             Medical Appointment
           </h1>
 
           {/* Appointment Info */}
-          <div className="mb-6 text-gray-600">
+          <div className="mb-6 text-muted-foreground">
             <span className="font-medium">Patient:</span> {patientName}
             {appointmentDate && (
               <>
@@ -287,12 +287,12 @@ export default function DoctorConsultation() {
 
             <TabsContent value="recording" className="space-y-6">
               {/* Audio Recording Section */}
-              <Card className="bg-white">
+              <Card className="bg-card">
                 <CardHeader>
                   <CardTitle className="text-xl font-semibold">
                     Audio Recording
                   </CardTitle>
-                  <p className="text-gray-600">
+                  <p className="text-muted-foreground">
                     Record your appointment conversation for transcription
                   </p>
                 </CardHeader>
@@ -306,7 +306,7 @@ export default function DoctorConsultation() {
                         onRecordingStop={handleRecordingStop}
                       />
                     ) : (
-                      <div className="text-center py-12 text-gray-500">
+                      <div className="text-center py-12 text-muted-foreground">
                         <LoadingSpinner />
                         <p className="mt-2">Loading consultation...</p>
                       </div>
@@ -322,9 +322,9 @@ export default function DoctorConsultation() {
                   consultationId={consultationId as Id<"consultations">}
                 />
               ) : (
-                <Card className="bg-white">
+                <Card className="bg-card">
                   <CardContent>
-                    <div className="text-center py-12 text-gray-500">
+                    <div className="text-center py-12 text-muted-foreground">
                       <LoadingSpinner />
                       <p className="mt-2">Loading consultation...</p>
                     </div>
@@ -339,9 +339,9 @@ export default function DoctorConsultation() {
                   consultationId={consultationId as Id<"consultations">}
                 />
               ) : (
-                <Card className="bg-white">
+                <Card className="bg-card">
                   <CardContent>
-                    <div className="text-center py-12 text-gray-500">
+                    <div className="text-center py-12 text-muted-foreground">
                       <LoadingSpinner />
                       <p className="mt-2">Loading consultation...</p>
                     </div>
@@ -357,9 +357,9 @@ export default function DoctorConsultation() {
                   patientId={patient._id}
                 />
               ) : (
-                <Card className="bg-white">
+                <Card className="bg-card">
                   <CardContent>
-                    <div className="text-center py-12 text-gray-500">
+                    <div className="text-center py-12 text-muted-foreground">
                       <LoadingSpinner />
                       <p className="mt-2">Loading trial matching...</p>
                     </div>

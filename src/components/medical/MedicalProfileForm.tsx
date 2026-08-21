@@ -574,7 +574,7 @@ export default function MedicalProfileForm({
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="flex items-center space-x-2">
-                <User className="h-5 w-5 text-[#0066CC]" />
+                <User className="h-5 w-5 text-primary" />
                 <span>Medical Profile</span>
               </CardTitle>
               <CardDescription>
@@ -582,10 +582,10 @@ export default function MedicalProfileForm({
               </CardDescription>
             </div>
             <div className="text-right">
-              <div className="text-2xl font-bold text-[#0066CC]">
+              <div className="text-2xl font-bold text-primary">
                 {completionPercentage || 0}%
               </div>
-              <div className="text-sm text-[#86868B]">Complete</div>
+              <div className="text-sm text-muted-foreground">Complete</div>
             </div>
           </div>
           <Progress value={completionPercentage || 0} className="mt-4" />
@@ -597,7 +597,7 @@ export default function MedicalProfileForm({
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <User className="h-5 w-5 text-[#0066CC]" />
+              <User className="h-5 w-5 text-primary" />
               <span>Demographics</span>
             </CardTitle>
           </CardHeader>
@@ -646,7 +646,7 @@ export default function MedicalProfileForm({
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <Heart className="h-5 w-5 text-[#0066CC]" />
+              <Heart className="h-5 w-5 text-primary" />
               <span>Basic Medical Information</span>
             </CardTitle>
             <CardDescription>
@@ -785,9 +785,9 @@ export default function MedicalProfileForm({
                 {basicMedicalInfo.medications.map((medication, index) => (
                   <div
                     key={index}
-                    className="flex items-center gap-1 bg-blue-50 p-2 rounded-lg"
+                    className="flex items-center gap-1 bg-primary/5 p-2 rounded-lg"
                   >
-                    <Badge className="bg-blue-100 text-blue-800 text-sm">
+                    <Badge className="bg-primary/10 text-primary text-sm">
                       {medication}
                     </Badge>
                     <Button
@@ -876,7 +876,7 @@ export default function MedicalProfileForm({
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <Activity className="h-5 w-5 text-[#0066CC]" />
+              <Activity className="h-5 w-5 text-primary" />
               <span>Physical Characteristics</span>
             </CardTitle>
           </CardHeader>
@@ -928,7 +928,7 @@ export default function MedicalProfileForm({
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <Heart className="h-5 w-5 text-[#0066CC]" />
+              <Heart className="h-5 w-5 text-primary" />
               <span>Lifestyle Factors</span>
             </CardTitle>
           </CardHeader>
@@ -1144,7 +1144,7 @@ export default function MedicalProfileForm({
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <Phone className="h-5 w-5 text-[#0066CC]" />
+              <Phone className="h-5 w-5 text-primary" />
               <span>Insurance & Emergency Contact</span>
             </CardTitle>
           </CardHeader>
@@ -1226,7 +1226,7 @@ export default function MedicalProfileForm({
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <MapPin className="h-5 w-5 text-[#0066CC]" />
+              <MapPin className="h-5 w-5 text-primary" />
               <span>Trial Preferences</span>
             </CardTitle>
           </CardHeader>

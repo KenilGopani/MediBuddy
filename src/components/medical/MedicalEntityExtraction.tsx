@@ -135,19 +135,19 @@ const MedicalEntityExtraction = ({
       case "conditions":
         return <Heart className="h-5 w-5 text-red-600" />;
       case "medications":
-        return <Pill className="h-5 w-5 text-blue-600" />;
+        return <Pill className="h-5 w-5 text-primary" />;
       case "allergies":
         return <AlertTriangle className="h-5 w-5 text-orange-600" />;
       case "symptoms":
-        return <Zap className="h-5 w-5 text-purple-600" />;
+        return <Zap className="h-5 w-5 text-accent-foreground" />;
       case "comorbidities":
         return <Shield className="h-5 w-5 text-green-600" />;
       case "vitals":
         return <Activity className="h-5 w-5 text-pink-600" />;
       case "labResults":
-        return <TestTube className="h-5 w-5 text-indigo-600" />;
+        return <TestTube className="h-5 w-5 text-primary" />;
       default:
-        return <Eye className="h-5 w-5 text-gray-600" />;
+        return <Eye className="h-5 w-5 text-muted-foreground" />;
     }
   };
 
@@ -156,19 +156,19 @@ const MedicalEntityExtraction = ({
       case "conditions":
         return "text-red-700 border-red-300 bg-red-50";
       case "medications":
-        return "text-blue-700 border-blue-300 bg-blue-50";
+        return "text-primary border-primary/25 bg-primary/5";
       case "allergies":
         return "text-orange-700 border-orange-300 bg-orange-50";
       case "symptoms":
-        return "text-purple-700 border-purple-300 bg-purple-50";
+        return "text-accent-foreground border-marker bg-accent";
       case "comorbidities":
         return "text-green-700 border-green-300 bg-green-50";
       case "vitals":
         return "text-pink-700 border-pink-300 bg-pink-50";
       case "labResults":
-        return "text-indigo-700 border-indigo-300 bg-indigo-50";
+        return "text-primary border-primary/25 bg-primary/5";
       default:
-        return "text-gray-700 border-gray-300 bg-gray-50";
+        return "text-muted-foreground border-border bg-muted/50";
     }
   };
 
@@ -205,18 +205,18 @@ const MedicalEntityExtraction = ({
           <div key={category.key} className="space-y-3">
             <div className="flex items-center space-x-2">
               {getCategoryIcon(category.key)}
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="text-lg font-semibold text-foreground">
                 {category.label}
               </h3>
             </div>
             {category.data.length === 0 ? (
-              <p className="text-gray-500 text-sm ml-7">None detected</p>
+              <p className="text-muted-foreground text-sm ml-7">None detected</p>
             ) : (
               <div className="ml-7 space-y-2">
                 {category.data.map((item: any, index: number) => (
                   <div
                     key={index}
-                    className="p-3 rounded-lg border border-gray-200 bg-white"
+                    className="p-3 rounded-lg border border-border bg-card"
                   >
                     <div className="flex items-center gap-2 mb-2">
                       <Badge
@@ -229,7 +229,7 @@ const MedicalEntityExtraction = ({
                     <div className="flex flex-wrap gap-2 mt-2">
                       {item.severity && (
                         <div className="flex items-center gap-1">
-                          <span className="text-xs font-medium text-gray-600">
+                          <span className="text-xs font-medium text-muted-foreground">
                             Severity:
                           </span>
                           <Badge
@@ -248,7 +248,7 @@ const MedicalEntityExtraction = ({
                       )}
                       {item.status && (
                         <div className="flex items-center gap-1">
-                          <span className="text-xs font-medium text-gray-600">
+                          <span className="text-xs font-medium text-muted-foreground">
                             Status:
                           </span>
                           <Badge
@@ -257,7 +257,7 @@ const MedicalEntityExtraction = ({
                               item.status === "active"
                                 ? "bg-emerald-100 text-emerald-700 border-emerald-200"
                                 : item.status === "resolved"
-                                  ? "bg-blue-100 text-blue-700 border-blue-200"
+                                  ? "bg-primary/10 text-primary border-primary/25"
                                   : "bg-amber-100 text-amber-700 border-amber-200"
                             }`}
                           >
@@ -267,12 +267,12 @@ const MedicalEntityExtraction = ({
                       )}
                       {item.dosage && (
                         <div className="flex items-center gap-1">
-                          <span className="text-xs font-medium text-gray-600">
+                          <span className="text-xs font-medium text-muted-foreground">
                             Dosage:
                           </span>
                           <Badge
                             variant="outline"
-                            className="text-xs text-blue-600 border-blue-200"
+                            className="text-xs text-primary border-primary/25"
                           >
                             {item.dosage}
                           </Badge>
@@ -280,7 +280,7 @@ const MedicalEntityExtraction = ({
                       )}
                       {item.frequency && (
                         <div className="flex items-center gap-1">
-                          <span className="text-xs font-medium text-gray-600">
+                          <span className="text-xs font-medium text-muted-foreground">
                             Frequency:
                           </span>
                           <Badge
@@ -293,7 +293,7 @@ const MedicalEntityExtraction = ({
                       )}
                       {item.reaction && (
                         <div className="flex items-center gap-1">
-                          <span className="text-xs font-medium text-gray-600">
+                          <span className="text-xs font-medium text-muted-foreground">
                             Reaction:
                           </span>
                           <Badge
@@ -306,12 +306,12 @@ const MedicalEntityExtraction = ({
                       )}
                       {item.duration && (
                         <div className="flex items-center gap-1">
-                          <span className="text-xs font-medium text-gray-600">
+                          <span className="text-xs font-medium text-muted-foreground">
                             Duration:
                           </span>
                           <Badge
                             variant="outline"
-                            className="text-xs text-purple-600 border-purple-200"
+                            className="text-xs text-accent-foreground border-marker"
                           >
                             {item.duration}
                           </Badge>
@@ -330,7 +330,7 @@ const MedicalEntityExtraction = ({
           <div className="space-y-3">
             <div className="flex items-center space-x-2">
               {getCategoryIcon("vitals")}
-              <h3 className="text-lg font-semibold text-gray-900">Vitals</h3>
+              <h3 className="text-lg font-semibold text-foreground">Vitals</h3>
             </div>
             <div className="ml-7 grid grid-cols-2 gap-3">
               {Object.entries(extractedEntities.vitals).map(([key, value]) => (
@@ -352,7 +352,7 @@ const MedicalEntityExtraction = ({
           <div className="space-y-3">
             <div className="flex items-center space-x-2">
               {getCategoryIcon("labResults")}
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="text-lg font-semibold text-foreground">
                 Lab Results
               </h3>
             </div>
@@ -432,7 +432,7 @@ const MedicalEntityExtraction = ({
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     {getCategoryIcon(category.key)}
-                    <h3 className="text-xl font-bold text-gray-900">
+                    <h3 className="text-xl font-bold text-foreground">
                       {category.label}
                     </h3>
                   </div>
@@ -444,8 +444,8 @@ const MedicalEntityExtraction = ({
 
                 {category.data.length === 0 ? (
                   <div className="text-center py-8">
-                    <div className="text-gray-400 mb-2">None detected</div>
-                    <p className="text-sm text-gray-500">
+                    <div className="text-muted-foreground mb-2">None detected</div>
+                    <p className="text-sm text-muted-foreground">
                       No {category.label.toLowerCase()} were identified in the
                       transcription
                     </p>
@@ -455,7 +455,7 @@ const MedicalEntityExtraction = ({
                     {category.data.map((item: any, index: number) => (
                       <div
                         key={index}
-                        className="p-4 rounded-lg border-2 border-gray-200 bg-white hover:shadow-md transition-shadow"
+                        className="p-4 rounded-lg border-2 border-border bg-card hover:shadow-md transition-shadow"
                       >
                         <div className="flex items-center gap-2 mb-3">
                           <Badge
@@ -468,7 +468,7 @@ const MedicalEntityExtraction = ({
                         <div className="flex flex-wrap gap-2 mt-2">
                           {item.severity && (
                             <div className="flex items-center gap-1">
-                              <span className="text-xs font-medium text-gray-600">
+                              <span className="text-xs font-medium text-muted-foreground">
                                 Severity:
                               </span>
                               <Badge
@@ -487,7 +487,7 @@ const MedicalEntityExtraction = ({
                           )}
                           {item.status && (
                             <div className="flex items-center gap-1">
-                              <span className="text-xs font-medium text-gray-600">
+                              <span className="text-xs font-medium text-muted-foreground">
                                 Status:
                               </span>
                               <Badge
@@ -496,7 +496,7 @@ const MedicalEntityExtraction = ({
                                   item.status === "active"
                                     ? "bg-emerald-100 text-emerald-700 border-emerald-200"
                                     : item.status === "resolved"
-                                      ? "bg-blue-100 text-blue-700 border-blue-200"
+                                      ? "bg-primary/10 text-primary border-primary/25"
                                       : "bg-amber-100 text-amber-700 border-amber-200"
                                 }`}
                               >
@@ -506,12 +506,12 @@ const MedicalEntityExtraction = ({
                           )}
                           {item.dosage && (
                             <div className="flex items-center gap-1">
-                              <span className="text-xs font-medium text-gray-600">
+                              <span className="text-xs font-medium text-muted-foreground">
                                 Dosage:
                               </span>
                               <Badge
                                 variant="outline"
-                                className="text-xs text-blue-600 border-blue-200"
+                                className="text-xs text-primary border-primary/25"
                               >
                                 {item.dosage}
                               </Badge>
@@ -519,7 +519,7 @@ const MedicalEntityExtraction = ({
                           )}
                           {item.frequency && (
                             <div className="flex items-center gap-1">
-                              <span className="text-xs font-medium text-gray-600">
+                              <span className="text-xs font-medium text-muted-foreground">
                                 Frequency:
                               </span>
                               <Badge
@@ -532,12 +532,12 @@ const MedicalEntityExtraction = ({
                           )}
                           {item.route && (
                             <div className="flex items-center gap-1">
-                              <span className="text-xs font-medium text-gray-600">
+                              <span className="text-xs font-medium text-muted-foreground">
                                 Route:
                               </span>
                               <Badge
                                 variant="outline"
-                                className="text-xs text-indigo-600 border-indigo-200"
+                                className="text-xs text-primary border-primary/25"
                               >
                                 {item.route}
                               </Badge>
@@ -545,7 +545,7 @@ const MedicalEntityExtraction = ({
                           )}
                           {item.reaction && (
                             <div className="flex items-center gap-1">
-                              <span className="text-xs font-medium text-gray-600">
+                              <span className="text-xs font-medium text-muted-foreground">
                                 Reaction:
                               </span>
                               <Badge
@@ -558,12 +558,12 @@ const MedicalEntityExtraction = ({
                           )}
                           {item.duration && (
                             <div className="flex items-center gap-1">
-                              <span className="text-xs font-medium text-gray-600">
+                              <span className="text-xs font-medium text-muted-foreground">
                                 Duration:
                               </span>
                               <Badge
                                 variant="outline"
-                                className="text-xs text-purple-600 border-purple-200"
+                                className="text-xs text-accent-foreground border-marker"
                               >
                                 {item.duration}
                               </Badge>
@@ -571,7 +571,7 @@ const MedicalEntityExtraction = ({
                           )}
                           {item.onset && (
                             <div className="flex items-center gap-1">
-                              <span className="text-xs font-medium text-gray-600">
+                              <span className="text-xs font-medium text-muted-foreground">
                                 Onset:
                               </span>
                               <Badge
@@ -608,10 +608,10 @@ const MedicalEntityExtraction = ({
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">
+            <h2 className="text-2xl font-bold text-foreground">
               Extracted Medical Entities
             </h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               AI-identified medical information from the transcription
             </p>
           </div>
@@ -683,20 +683,20 @@ const MedicalEntityExtraction = ({
       <CardContent>
         {!consultation.transcription ? (
           <div className="text-center py-8">
-            <AlertTriangle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600 mb-2">No transcription available</p>
-            <p className="text-sm text-gray-500">
+            <AlertTriangle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground mb-2">No transcription available</p>
+            <p className="text-sm text-muted-foreground">
               Complete the audio recording and transcription to extract medical
               entities
             </p>
           </div>
         ) : !extractedEntities ? (
           <div className="text-center py-8">
-            <Eye className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600 mb-2">
+            <Eye className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground mb-2">
               No medical entities extracted yet
             </p>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted-foreground">
               Click "Extract Entities" to analyze the transcription with AI
             </p>
           </div>

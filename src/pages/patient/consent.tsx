@@ -128,12 +128,12 @@ export default function ConsentPage() {
           </Badge>
         );
       case "enrolled":
-        return <Badge className="bg-blue-100 text-blue-800">Enrolled</Badge>;
+        return <Badge className="bg-primary/10 text-primary">Enrolled</Badge>;
       case "declined":
         return <Badge className="bg-red-100 text-red-800">Declined</Badge>;
       default:
         return (
-          <Badge className="bg-gray-100 text-gray-800">Unknown Status</Badge>
+          <Badge className="bg-muted text-foreground">Unknown Status</Badge>
         );
     }
   };
@@ -143,7 +143,7 @@ export default function ConsentPage() {
       case "approved":
         return <CheckCircle className="h-5 w-5 text-green-600" />;
       case "enrolled":
-        return <CheckCircle className="h-5 w-5 text-blue-600" />;
+        return <CheckCircle className="h-5 w-5 text-primary" />;
       case "pending":
         return <Clock className="h-5 w-5 text-yellow-600" />;
       default:
@@ -152,7 +152,7 @@ export default function ConsentPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FBFBFD]">
+    <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-8">
@@ -166,66 +166,66 @@ export default function ConsentPage() {
                 </Button>
               </Link>
             </div>
-            <h1 className="text-3xl font-semibold text-[#1D1D1F] mb-2">
+            <h1 className="text-4xl font-extrabold text-foreground mb-2">
               Consent Forms
             </h1>
-            <p className="text-lg text-[#86868B]">
+            <p className="text-lg text-muted-foreground">
               Review and sign consent forms for clinical trial participation
             </p>
           </div>
 
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <Card className="bg-white">
+            <Card className="bg-card">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-[#86868B]">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
                   Total Forms
                 </CardTitle>
-                <FileText className="h-4 w-4 text-[#0066CC]" />
+                <FileText className="h-4 w-4 text-primary" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-[#1D1D1F]">
+                <div className="font-display text-4xl font-extrabold text-foreground">
                   {consentForms.length}
                 </div>
-                <p className="text-xs text-[#86868B] mt-1">Available forms</p>
+                <p className="text-xs text-muted-foreground mt-1">Available forms</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-white">
+            <Card className="bg-card">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-[#86868B]">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
                   Pending
                 </CardTitle>
                 <Clock className="h-4 w-4 text-yellow-600" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-[#1D1D1F]">
+                <div className="font-display text-4xl font-extrabold text-foreground">
                   {
                     consentForms.filter((form) => form.status === "pending")
                       .length
                   }
                 </div>
-                <p className="text-xs text-[#86868B] mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Awaiting doctor review
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="bg-white">
+            <Card className="bg-card">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-[#86868B]">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
                   Ready to Sign
                 </CardTitle>
                 <CheckCircle className="h-4 w-4 text-green-600" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-[#1D1D1F]">
+                <div className="font-display text-4xl font-extrabold text-foreground">
                   {
                     consentForms.filter((form) => form.status === "approved")
                       .length
                   }
                 </div>
-                <p className="text-xs text-[#86868B] mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Ready for signature
                 </p>
               </CardContent>
@@ -236,7 +236,7 @@ export default function ConsentPage() {
           <div className="space-y-6">
             {consentForms.length > 0 ? (
               consentForms.map((form) => (
-                <Card key={form.id} className="bg-white">
+                <Card key={form.id} className="bg-card">
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex items-start space-x-3">
@@ -255,7 +255,7 @@ export default function ConsentPage() {
                                   href={`https://clinicaltrials.gov/study/${form.nctId}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="text-[#0066CC] hover:underline inline-flex items-center"
+                                  className="text-primary hover:underline inline-flex items-center"
                                 >
                                   {form.nctId}
                                   <ExternalLink className="h-3 w-3 ml-1" />
@@ -264,10 +264,10 @@ export default function ConsentPage() {
                             )}
                           </CardDescription>
                           <div className="flex items-center mt-2 space-x-4">
-                            <span className="text-sm text-[#86868B]">
+                            <span className="text-sm text-muted-foreground">
                               Match: {form.relevanceScore}%
                             </span>
-                            <span className="text-sm text-[#86868B]">
+                            <span className="text-sm text-muted-foreground">
                               Received:{" "}
                               {new Date(form.matchDate).toLocaleDateString()}
                             </span>
@@ -283,14 +283,14 @@ export default function ConsentPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {/* Requirements */}
                       <div>
-                        <h4 className="font-medium text-[#1D1D1F] mb-3">
+                        <h4 className="font-medium text-foreground mb-3">
                           Study Requirements
                         </h4>
                         <ul className="space-y-2">
                           {form.requirements.map((req, index) => (
                             <li
                               key={index}
-                              className="flex items-start space-x-2 text-sm text-[#86868B]"
+                              className="flex items-start space-x-2 text-sm text-muted-foreground"
                             >
                               <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
                               <span>{req}</span>
@@ -301,18 +301,18 @@ export default function ConsentPage() {
 
                       {/* Documents */}
                       <div>
-                        <h4 className="font-medium text-[#1D1D1F] mb-3">
+                        <h4 className="font-medium text-foreground mb-3">
                           Required Documents
                         </h4>
                         <div className="space-y-2">
                           {form.documents.map((doc, index) => (
                             <div
                               key={index}
-                              className="flex items-center justify-between p-2 rounded-lg bg-[#F5F5F7]"
+                              className="flex items-center justify-between p-2 rounded-lg bg-muted"
                             >
                               <div className="flex items-center space-x-2">
-                                <FileText className="h-4 w-4 text-[#0066CC]" />
-                                <span className="text-sm text-[#1D1D1F]">
+                                <FileText className="h-4 w-4 text-primary" />
+                                <span className="text-sm text-foreground">
                                   {doc}
                                 </span>
                               </div>
@@ -331,7 +331,7 @@ export default function ConsentPage() {
                     </div>
 
                     {/* ClinicalTrials.gov Link */}
-                    <div className="mt-6 pt-4 border-t border-gray-100">
+                    <div className="mt-6 pt-4 border-t border-border">
                       <Button
                         variant="outline"
                         className="w-full"
@@ -348,8 +348,8 @@ export default function ConsentPage() {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex items-center justify-between mt-6 pt-6 border-t border-gray-200">
-                      <div className="text-sm text-[#86868B]">
+                    <div className="flex items-center justify-between mt-6 pt-6 border-t border-border">
+                      <div className="text-sm text-muted-foreground">
                         {form.status === "pending"
                           ? "Waiting for doctor review before you can sign consent"
                           : form.status === "approved"
@@ -379,7 +379,7 @@ export default function ConsentPage() {
                           <>
                             <div className="flex gap-2">
                               <Button
-                                className="bg-[#0066CC] hover:bg-[#0052A3]"
+                                className="bg-primary hover:bg-primary"
                                 onClick={() => handleSignConsent(form.id)}
                               >
                                 Sign Consent
@@ -423,13 +423,13 @@ export default function ConsentPage() {
                 </Card>
               ))
             ) : (
-              <Card className="bg-white">
+              <Card className="bg-card">
                 <CardContent className="text-center py-12">
-                  <FileText className="h-12 w-12 text-[#86868B] mx-auto mb-4 opacity-50" />
-                  <h3 className="text-lg font-medium text-[#1D1D1F] mb-2">
+                  <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
+                  <h3 className="text-lg font-medium text-foreground mb-2">
                     No Consent Forms Available
                   </h3>
-                  <p className="text-[#86868B] mb-4">
+                  <p className="text-muted-foreground mb-4">
                     You don't have any consent forms to review at this time.
                   </p>
                   <Link to="/patient/dashboard">

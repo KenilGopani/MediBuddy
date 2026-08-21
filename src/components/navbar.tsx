@@ -24,7 +24,7 @@ function DashboardLink() {
   return (
     <Link
       to={dashboardPath}
-      className="inline-flex items-center px-3.5 py-1.5 text-sm font-medium text-[#1D1D1F] bg-[#F5F5F7] hover:bg-[#E5E5E5] rounded-full transition-colors duration-200"
+      className="inline-flex items-center px-4 py-2 text-sm font-bold text-foreground bg-accent hover:bg-marker/60 rounded-lg transition-colors duration-150"
     >
       <svg
         className="w-4 h-4 mr-1.5"
@@ -54,12 +54,12 @@ export function Navbar() {
   }, [user, createOrUpdateUser]);
 
   return (
-    <nav className="sticky top-0 w-full bg-white/80 backdrop-blur-xl border-b border-neutral-200/50 z-50">
+    <nav className="sticky top-0 w-full bg-background/85 backdrop-blur-md border-b border-border z-50">
       <div className="container mx-auto px-4">
-        <div className="flex h-12 items-center justify-between">
-          <Link to="/" className="flex items-center space-x-2">
+        <div className="flex h-14 items-center justify-between">
+          <Link to="/" className="flex items-center gap-2.5">
             <Logo size={30} />
-            <span className="text-xl font-medium text-[#1D1D1F]">
+            <span className="font-display text-xl font-extrabold tracking-tight text-foreground">
               MediBuddy AI
             </span>
           </Link>
@@ -78,7 +78,7 @@ export function Navbar() {
                 <SignInButton mode="modal" signUpFallbackRedirectUrl="/">
                   <Button
                     variant="default"
-                    className="h-8 px-4 text-sm rounded-[14px] bg-[#0066CC] hover:bg-[#0077ED] text-white shadow-sm transition-all"
+                    className="h-9 px-4 text-sm"
                   >
                     Sign In
                   </Button>
@@ -88,8 +88,8 @@ export function Navbar() {
           ) : (
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-4">
-                <div className="h-4 w-16 bg-[#F5F5F7] rounded-full animate-pulse"></div>
-                <div className="h-8 w-8 rounded-full bg-[#F5F5F7] animate-pulse"></div>
+                <div className="h-4 w-16 bg-muted rounded-full animate-pulse"></div>
+                <div className="h-8 w-8 rounded-full bg-muted animate-pulse"></div>
               </div>
             </div>
           )}

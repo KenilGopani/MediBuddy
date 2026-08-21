@@ -1,89 +1,62 @@
+import { Logo } from "@/components/ui/logo";
+
+const LINK_GROUPS = [
+  {
+    title: "Product",
+    links: [
+      { label: "Documentation", href: "/docs" },
+      { label: "Support", href: "/support" },
+      { label: "Blog", href: "/blog" },
+    ],
+  },
+  {
+    title: "Legal",
+    links: [
+      { label: "Privacy Policy", href: "/privacy" },
+      { label: "Terms of Service", href: "/terms" },
+    ],
+  },
+];
+
 export function Footer() {
   return (
-    <footer className="w-full border-t border-neutral-200/50 bg-[#F5F5F7]">
-      <div className="container mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-          <div className="space-y-4">
-            <h3 className="text-base font-semibold text-[#1D1D1F]">
-              MediBuddy AI
-            </h3>
-            <p className="text-base text-[#86868B] leading-relaxed">
-              Revolutionizing clinical trial matching through AI-powered
-              conversation analysis.
+    <footer className="w-full border-t border-border bg-secondary/60">
+      <div className="container mx-auto px-4 py-14">
+        <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr_1fr] gap-10">
+          <div className="space-y-4 max-w-sm">
+            <div className="flex items-center gap-2.5">
+              <Logo size={28} />
+              <span className="font-display text-lg font-extrabold">
+                MediBuddy AI
+              </span>
+            </div>
+            <p className="text-muted-foreground leading-relaxed">
+              Turns the conversation you were already having into notes, a
+              report, and trials worth asking about. Nothing is shared without
+              the patient's say-so.
             </p>
           </div>
-          <div className="space-y-4">
-            <h4 className="text-base font-semibold text-[#1D1D1F]">Features</h4>
-            <ul className="space-y-3">
-              <li className="text-base text-[#86868B] hover:text-[#1D1D1F] transition-colors">
-                AI Transcription
-              </li>
-              <li className="text-base text-[#86868B] hover:text-[#1D1D1F] transition-colors">
-                Trial Matching
-              </li>
-              <li className="text-base text-[#86868B] hover:text-[#1D1D1F] transition-colors">
-                HIPAA Compliant
-              </li>
-            </ul>
-          </div>
-          <div className="space-y-4">
-            <h4 className="text-base font-semibold text-[#1D1D1F]">
-              Resources
-            </h4>
-            <ul className="space-y-3">
-              <li>
-                <a
-                  href="/docs"
-                  className="text-base text-[#86868B] hover:text-[#0066CC] transition-colors"
-                >
-                  Documentation
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/support"
-                  className="text-base text-[#86868B] hover:text-[#0066CC] transition-colors"
-                >
-                  Support
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/blog"
-                  className="text-base text-[#86868B] hover:text-[#0066CC] transition-colors"
-                >
-                  Blog
-                </a>
-              </li>
-            </ul>
-          </div>
-          <div className="space-y-4">
-            <h4 className="text-base font-semibold text-[#1D1D1F]">Legal</h4>
-            <ul className="space-y-3">
-              <li>
-                <a
-                  href="/privacy"
-                  className="text-base text-[#86868B] hover:text-[#0066CC] transition-colors"
-                >
-                  Privacy Policy
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/terms"
-                  className="text-base text-[#86868B] hover:text-[#0066CC] transition-colors"
-                >
-                  Terms of Service
-                </a>
-              </li>
-            </ul>
-          </div>
+          {LINK_GROUPS.map((group) => (
+            <div key={group.title} className="space-y-3">
+              <h4 className="font-display text-base font-bold">{group.title}</h4>
+              <ul className="space-y-2">
+                {group.links.map((link) => (
+                  <li key={link.href}>
+                    <a
+                      href={link.href}
+                      className="text-muted-foreground hover:text-primary underline-offset-4 hover:underline transition-colors"
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
-        <div className="mt-16 pt-8 border-t border-neutral-200/50">
-          <p className="text-center text-sm text-[#86868B]">
-            © {new Date().getFullYear()} MediBuddy AI. All rights reserved.
-          </p>
-        </div>
+        <p className="mt-12 pt-6 border-t border-border text-sm text-muted-foreground">
+          © {new Date().getFullYear()} MediBuddy AI
+        </p>
       </div>
     </footer>
   );

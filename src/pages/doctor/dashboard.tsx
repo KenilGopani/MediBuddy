@@ -127,16 +127,16 @@ export default function DoctorDashboard() {
   const pendingTrialMatches = trialMatches?.slice(0, 5) || [];
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FBFBFD]">
+    <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-8">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-semibold text-[#1D1D1F] mb-2">
+            <h1 className="text-4xl font-extrabold text-foreground mb-2">
               Welcome back, Dr. {userData?.name?.split(" ")[0] || "Doctor"}
             </h1>
-            <p className="text-lg text-[#86868B]">
+            <p className="text-lg text-muted-foreground">
               {userData?.specialization && `${userData.specialization} • `}
               Here's your practice overview for today
             </p>
@@ -144,48 +144,48 @@ export default function DoctorDashboard() {
 
           {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            <Card className="bg-white">
+            <Card className="bg-card">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-[#86868B]">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
                   Active Consultations
                 </CardTitle>
-                <Stethoscope className="h-4 w-4 text-[#0066CC]" />
+                <Stethoscope className="h-4 w-4 text-primary" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-[#1D1D1F]">
+                <div className="font-display text-4xl font-extrabold text-foreground">
                   {stats.activeConsultations}
                 </div>
-                <p className="text-xs text-[#86868B] mt-1">In progress now</p>
+                <p className="text-xs text-muted-foreground mt-1">In progress now</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-white">
+            <Card className="bg-card">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-[#86868B]">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
                   Completed Today
                 </CardTitle>
-                <FileText className="h-4 w-4 text-[#0066CC]" />
+                <FileText className="h-4 w-4 text-primary" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-[#1D1D1F]">
+                <div className="font-display text-4xl font-extrabold text-foreground">
                   {stats.completedToday}
                 </div>
-                <p className="text-xs text-[#86868B] mt-1">Great progress!</p>
+                <p className="text-xs text-muted-foreground mt-1">Great progress!</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-white">
+            <Card className="bg-card">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-[#86868B]">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
                   Trial Matches
                 </CardTitle>
-                <TrendingUp className="h-4 w-4 text-[#0066CC]" />
+                <TrendingUp className="h-4 w-4 text-primary" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-[#1D1D1F]">
+                <div className="font-display text-4xl font-extrabold text-foreground">
                   {stats.trialMatches}
                 </div>
-                <p className="text-xs text-[#86868B] mt-1">Pending review</p>
+                <p className="text-xs text-muted-foreground mt-1">Pending review</p>
               </CardContent>
             </Card>
           </div>
@@ -193,7 +193,7 @@ export default function DoctorDashboard() {
           {/* Quick Actions */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <Link to="/doctor/consultation">
-              <Card className="cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02] bg-gradient-to-br from-[#0066CC] to-[#0077ED] text-white">
+              <Card className="cursor-pointer transition-all hover:shadow-lg hover:-translate-y-0.5 bg-gradient-to-br from-primary to-primary/90 text-white">
                 <CardHeader>
                   <div className="flex items-center space-x-3">
                     <div className="p-2 rounded-full bg-white/20">
@@ -213,11 +213,11 @@ export default function DoctorDashboard() {
             </Link>
 
             <Link to="/doctor/trial-matching">
-              <Card className="cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02] bg-white">
+              <Card className="cursor-pointer transition-all hover:shadow-lg hover:-translate-y-0.5 bg-card">
                 <CardHeader>
                   <div className="flex items-center space-x-3">
-                    <div className="p-2 rounded-full bg-[#0066CC]/10">
-                      <Search className="h-6 w-6 text-[#0066CC]" />
+                    <div className="p-2.5 rounded-xl bg-primary/10">
+                      <Search className="h-6 w-6 text-primary" />
                     </div>
                     <div>
                       <CardTitle>Review Trial Matches</CardTitle>
@@ -235,11 +235,11 @@ export default function DoctorDashboard() {
               onOpenChange={setIsScheduleDialogOpen}
             >
               <DialogTrigger asChild>
-                <Card className="cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02] bg-white">
+                <Card className="cursor-pointer transition-all hover:shadow-lg hover:-translate-y-0.5 bg-card">
                   <CardHeader>
                     <div className="flex items-center space-x-3">
-                      <div className="p-2 rounded-full bg-[#0066CC]/10">
-                        <CalendarIcon className="h-6 w-6 text-[#0066CC]" />
+                      <div className="p-2.5 rounded-xl bg-primary/10">
+                        <CalendarIcon className="h-6 w-6 text-primary" />
                       </div>
                       <div>
                         <CardTitle>Schedule Appointment</CardTitle>
@@ -253,11 +253,11 @@ export default function DoctorDashboard() {
               </DialogTrigger>
               <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader className="space-y-3">
-                  <DialogTitle className="text-2xl font-semibold text-[#1D1D1F] flex items-center gap-2">
-                    <CalendarDays className="h-6 w-6 text-[#0066CC]" />
+                  <DialogTitle className="text-2xl font-semibold text-foreground flex items-center gap-2">
+                    <CalendarDays className="h-6 w-6 text-primary" />
                     Schedule Appointment
                   </DialogTitle>
-                  <DialogDescription className="text-[#86868B] text-base">
+                  <DialogDescription className="text-muted-foreground text-base">
                     Fill in the details below to schedule an appointment with
                     your patient.
                   </DialogDescription>
@@ -266,8 +266,8 @@ export default function DoctorDashboard() {
                 <div className="space-y-6 py-6">
                   {/* Patient Selection */}
                   <div className="space-y-3">
-                    <Label className="text-sm font-semibold text-[#1D1D1F] flex items-center gap-2">
-                      <User className="h-4 w-4 text-[#0066CC]" />
+                    <Label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                      <User className="h-4 w-4 text-primary" />
                       Select Patient
                       <span className="text-red-500">*</span>
                     </Label>
@@ -275,17 +275,17 @@ export default function DoctorDashboard() {
                       value={selectedPatient}
                       onValueChange={setSelectedPatient}
                     >
-                      <SelectTrigger className="h-12 border-2 hover:border-[#0066CC]/50 focus:border-[#0066CC] transition-colors">
+                      <SelectTrigger className="h-12 border-2 hover:border-primary/50 focus:border-primary transition-colors">
                         <SelectValue placeholder="Choose a patient from your list" />
                       </SelectTrigger>
                       <SelectContent>
                         {allPatients?.map((patient) => (
                           <SelectItem key={patient._id} value={patient._id}>
                             <div className="flex flex-col py-1">
-                              <span className="font-semibold text-[#1D1D1F]">
+                              <span className="font-semibold text-foreground">
                                 {patient.name || "Unnamed Patient"}
                               </span>
-                              <span className="text-sm text-[#86868B]">
+                              <span className="text-sm text-muted-foreground">
                                 {patient.age && `Age: ${patient.age}`}
                                 {patient.gender && ` • ${patient.gender}`}
                                 {patient.location && ` • ${patient.location}`}
@@ -299,7 +299,7 @@ export default function DoctorDashboard() {
 
                   {/* Appointment Title */}
                   <div className="space-y-3">
-                    <Label className="text-sm font-semibold text-[#1D1D1F]">
+                    <Label className="text-sm font-semibold text-foreground">
                       Appointment Title
                       <span className="text-red-500 ml-1">*</span>
                     </Label>
@@ -307,7 +307,7 @@ export default function DoctorDashboard() {
                       placeholder="e.g., Follow-up consultation, Annual check-up"
                       value={meetingTitle}
                       onChange={(e) => setMeetingTitle(e.target.value)}
-                      className="h-12 border-2 hover:border-[#0066CC]/50 focus:border-[#0066CC] transition-colors"
+                      className="h-12 border-2 hover:border-primary/50 focus:border-primary transition-colors"
                     />
                   </div>
 
@@ -315,8 +315,8 @@ export default function DoctorDashboard() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Date Picker */}
                     <div className="space-y-3">
-                      <Label className="text-sm font-semibold text-[#1D1D1F] flex items-center gap-2">
-                        <CalendarIcon className="h-4 w-4 text-[#0066CC]" />
+                      <Label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                        <CalendarIcon className="h-4 w-4 text-primary" />
                         Date
                         <span className="text-red-500">*</span>
                       </Label>
@@ -324,7 +324,7 @@ export default function DoctorDashboard() {
                         <PopoverTrigger asChild>
                           <Button
                             variant="outline"
-                            className={`h-12 w-full justify-start text-left font-normal border-2 hover:border-[#0066CC]/50 transition-colors ${
+                            className={`h-12 w-full justify-start text-left font-normal border-2 hover:border-primary/50 transition-colors ${
                               !meetingDate && "text-muted-foreground"
                             }`}
                           >
@@ -350,8 +350,8 @@ export default function DoctorDashboard() {
 
                     {/* Time Picker */}
                     <div className="space-y-3">
-                      <Label className="text-sm font-semibold text-[#1D1D1F] flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-[#0066CC]" />
+                      <Label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-primary" />
                         Time
                         <span className="text-red-500">*</span>
                       </Label>
@@ -359,7 +359,7 @@ export default function DoctorDashboard() {
                         value={meetingTime}
                         onValueChange={setMeetingTime}
                       >
-                        <SelectTrigger className="h-12 border-2 hover:border-[#0066CC]/50 focus:border-[#0066CC] transition-colors">
+                        <SelectTrigger className="h-12 border-2 hover:border-primary/50 focus:border-primary transition-colors">
                           <SelectValue placeholder="Select time" />
                         </SelectTrigger>
                         <SelectContent>
@@ -383,14 +383,14 @@ export default function DoctorDashboard() {
                   {/* Duration and Type Row */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-3">
-                      <Label className="text-sm font-semibold text-[#1D1D1F]">
+                      <Label className="text-sm font-semibold text-foreground">
                         Duration
                       </Label>
                       <Select
                         value={meetingDuration}
                         onValueChange={setMeetingDuration}
                       >
-                        <SelectTrigger className="h-12 border-2 hover:border-[#0066CC]/50 focus:border-[#0066CC] transition-colors">
+                        <SelectTrigger className="h-12 border-2 hover:border-primary/50 focus:border-primary transition-colors">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -404,14 +404,14 @@ export default function DoctorDashboard() {
                       </Select>
                     </div>
                     <div className="space-y-3">
-                      <Label className="text-sm font-semibold text-[#1D1D1F]">
+                      <Label className="text-sm font-semibold text-foreground">
                         Appointment Type
                       </Label>
                       <Select
                         value={meetingType}
                         onValueChange={setMeetingType}
                       >
-                        <SelectTrigger className="h-12 border-2 hover:border-[#0066CC]/50 focus:border-[#0066CC] transition-colors">
+                        <SelectTrigger className="h-12 border-2 hover:border-primary/50 focus:border-primary transition-colors">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -428,9 +428,9 @@ export default function DoctorDashboard() {
 
                   {/* Notes */}
                   <div className="space-y-3">
-                    <Label className="text-sm font-semibold text-[#1D1D1F]">
+                    <Label className="text-sm font-semibold text-foreground">
                       Additional Notes
-                      <span className="text-[#86868B] font-normal ml-1">
+                      <span className="text-muted-foreground font-normal ml-1">
                         (Optional)
                       </span>
                     </Label>
@@ -438,12 +438,12 @@ export default function DoctorDashboard() {
                       placeholder="Add any additional notes, special instructions, or preparation requirements for this appointment..."
                       value={meetingDescription}
                       onChange={(e) => setMeetingDescription(e.target.value)}
-                      className="min-h-[100px] resize-none border-2 hover:border-[#0066CC]/50 focus:border-[#0066CC] transition-colors"
+                      className="min-h-[100px] resize-none border-2 hover:border-primary/50 focus:border-primary transition-colors"
                     />
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200">
+                  <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-border">
                     <Button
                       variant="outline"
                       onClick={() => {
@@ -457,7 +457,7 @@ export default function DoctorDashboard() {
                         setMeetingDuration("30");
                         setMeetingType("consultation");
                       }}
-                      className="h-12 px-8 border-2 hover:bg-gray-50"
+                      className="h-12 px-8 border-2 hover:bg-muted/50"
                     >
                       Cancel
                     </Button>
@@ -518,7 +518,7 @@ export default function DoctorDashboard() {
                         !meetingTime ||
                         !meetingTitle
                       }
-                      className="h-12 px-8 bg-[#0066CC] hover:bg-[#0077ED] text-white font-semibold"
+                      className="h-12 px-8 bg-primary hover:bg-primary/90 text-white font-semibold"
                     >
                       Schedule Appointment
                     </Button>
@@ -530,10 +530,10 @@ export default function DoctorDashboard() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Upcoming Appointments */}
-            <Card className="bg-white h-full">
+            <Card className="bg-card h-full">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <CalendarDays className="h-5 w-5 text-[#0066CC]" />
+                  <CalendarDays className="h-5 w-5 text-primary" />
                   <span>Upcoming Appointments</span>
                 </CardTitle>
                 <CardDescription>
@@ -555,22 +555,22 @@ export default function DoctorDashboard() {
                           to={`/doctor/consultation?patientId=${appointment.patientId}&meetingId=${appointment._id}`}
                           className="block"
                         >
-                          <div className="flex items-center justify-between p-3 rounded-lg bg-[#F5F5F7] hover:bg-blue-50 transition-colors cursor-pointer border-l-4 border-transparent hover:border-[#0066CC]">
+                          <div className="flex items-center justify-between p-3 rounded-lg bg-muted hover:bg-primary/5 transition-colors cursor-pointer border-l-4 border-transparent hover:border-primary">
                             <div className="flex-1">
-                              <div className="font-medium text-[#1D1D1F]">
+                              <div className="font-medium text-foreground">
                                 {appointment.title || "Medical Appointment"}
                               </div>
-                              <div className="text-sm text-[#86868B]">
+                              <div className="text-sm text-muted-foreground">
                                 {patient?.name ||
                                   `Patient ID: ${appointment.patientId.toString().substring(0, 8)}`}
                               </div>
-                              <div className="text-sm text-[#86868B]">
+                              <div className="text-sm text-muted-foreground">
                                 {new Date(
                                   appointment.scheduledDate
                                 ).toLocaleString()}
                               </div>
                               {appointment.description && (
-                                <div className="text-xs text-[#86868B] mt-1 truncate">
+                                <div className="text-xs text-muted-foreground mt-1 truncate">
                                   {appointment.description}
                                 </div>
                               )}
@@ -578,14 +578,14 @@ export default function DoctorDashboard() {
                             <div className="flex flex-col items-end space-y-1">
                               <Badge
                                 variant="outline"
-                                className="text-xs bg-blue-50 text-blue-700 border-blue-200"
+                                className="text-xs bg-primary/5 text-primary border-primary/25"
                               >
                                 {appointment.type || "consultation"}
                               </Badge>
-                              <div className="text-xs text-[#86868B]">
+                              <div className="text-xs text-muted-foreground">
                                 {appointment.duration || 30} min
                               </div>
-                              <div className="text-xs text-[#0066CC] font-medium">
+                              <div className="text-xs text-primary font-medium">
                                 Click to start →
                               </div>
                             </div>
@@ -594,7 +594,7 @@ export default function DoctorDashboard() {
                       );
                     })
                   ) : (
-                    <div className="text-center py-6 text-gray-500">
+                    <div className="text-center py-6 text-muted-foreground">
                       No upcoming appointments scheduled.
                     </div>
                   )}
@@ -604,10 +604,10 @@ export default function DoctorDashboard() {
 
             {/* Pending Trial Matches */}
             <Link to="/doctor/trial-matching?filter=pending">
-              <Card className="bg-white h-full cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02] flex flex-col">
+              <Card className="bg-card h-full cursor-pointer transition-all hover:shadow-lg hover:-translate-y-0.5 flex flex-col">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
-                    <TrendingUp className="h-5 w-5 text-[#0066CC]" />
+                    <TrendingUp className="h-5 w-5 text-primary" />
                     <span>Pending Trial Matches</span>
                   </CardTitle>
                   <CardDescription>
@@ -618,16 +618,16 @@ export default function DoctorDashboard() {
                   <div className="text-center">
                     {pendingTrialMatchesCount > 0 ? (
                       <div>
-                        <div className="text-2xl font-bold text-[#0066CC] mb-2">
+                        <div className="font-display text-4xl font-extrabold text-primary mb-2">
                           {pendingTrialMatchesCount}
                         </div>
-                        <p className="text-sm text-[#86868B]">
+                        <p className="text-sm text-muted-foreground">
                           {pendingTrialMatchesCount === 1 ? "match" : "matches"}{" "}
                           pending review
                         </p>
                       </div>
                     ) : (
-                      <div className="text-gray-500">
+                      <div className="text-muted-foreground">
                         No pending trial matches found.
                       </div>
                     )}

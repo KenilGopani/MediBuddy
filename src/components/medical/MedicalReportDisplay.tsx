@@ -104,16 +104,16 @@ const MedicalReportDisplay = ({
 
           // Determine icon, color, and clean header text based on section
           let icon = null;
-          let colorClass = "text-gray-900";
-          let borderColor = "border-gray-300";
-          let bgColor = "bg-gray-50";
+          let colorClass = "text-foreground";
+          let borderColor = "border-border";
+          let bgColor = "bg-muted/50";
           let cleanHeaderText = headerText;
 
           if (headerText.includes("S (") || headerText.includes("Subjective")) {
-            icon = <Stethoscope className="h-5 w-5 mr-2 text-blue-600" />;
-            colorClass = "text-blue-900";
-            borderColor = "border-blue-300";
-            bgColor = "bg-blue-50";
+            icon = <Stethoscope className="h-5 w-5 mr-2 text-primary" />;
+            colorClass = "text-primary";
+            borderColor = "border-primary/25";
+            bgColor = "bg-primary/5";
             cleanHeaderText = "S (Subjective)";
           } else if (
             headerText.includes("O (") ||
@@ -137,10 +137,10 @@ const MedicalReportDisplay = ({
             headerText.includes("P (") ||
             headerText.includes("Plan")
           ) {
-            icon = <FileText className="h-5 w-5 mr-2 text-purple-600" />;
-            colorClass = "text-purple-900";
-            borderColor = "border-purple-300";
-            bgColor = "bg-purple-50";
+            icon = <FileText className="h-5 w-5 mr-2 text-accent-foreground" />;
+            colorClass = "text-accent-foreground";
+            borderColor = "border-marker";
+            bgColor = "bg-accent";
             cleanHeaderText = "P (Plan)";
           } else if (headerText.includes("ICD")) {
             icon = <FileText className="h-5 w-5 mr-2 text-red-600" />;
@@ -161,7 +161,7 @@ const MedicalReportDisplay = ({
               <div
                 className={`${bgColor} p-6 rounded-lg border-l-4 ${borderColor} shadow-sm`}
               >
-                <div className="text-gray-800 leading-relaxed">
+                <div className="text-foreground leading-relaxed">
                   {sectionContent.split("\n").map((line, lineIndex) => {
                     if (line.trim() === "")
                       return <div key={lineIndex} className="mb-3" />;
@@ -173,7 +173,7 @@ const MedicalReportDisplay = ({
                     ) {
                       return (
                         <div key={lineIndex} className="flex items-start mb-2">
-                          <span className="text-gray-600 mr-2 mt-1">•</span>
+                          <span className="text-muted-foreground mr-2 mt-1">•</span>
                           <span className="flex-1">
                             {line.replace(/^[-•]\s*/, "")}
                           </span>
@@ -190,12 +190,12 @@ const MedicalReportDisplay = ({
                       return (
                         <div
                           key={lineIndex}
-                          className="mb-3 p-4 bg-white rounded-md border border-red-200 shadow-sm"
+                          className="mb-3 p-4 bg-card rounded-md border border-red-200 shadow-sm"
                         >
                           <div className="font-mono font-bold text-red-700 text-lg">
                             {code.trim()}
                           </div>
-                          <div className="text-gray-700 mt-1">
+                          <div className="text-muted-foreground mt-1">
                             {description.trim()}
                           </div>
                         </div>
@@ -205,7 +205,7 @@ const MedicalReportDisplay = ({
                     return (
                       <p
                         key={lineIndex}
-                        className="mb-3 text-gray-800 leading-relaxed"
+                        className="mb-3 text-foreground leading-relaxed"
                       >
                         {line}
                       </p>
@@ -221,7 +221,7 @@ const MedicalReportDisplay = ({
         if (section.trim()) {
           return (
             <div key={index} className="mb-4">
-              <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
+              <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
                 {section.trim()}
               </p>
             </div>
@@ -249,7 +249,7 @@ const MedicalReportDisplay = ({
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <FileText className="h-6 w-6 text-blue-600" />
+              <FileText className="h-6 w-6 text-primary" />
               <span>Medical Report</span>
             </div>
             <div className="flex items-center space-x-2">
@@ -283,20 +283,20 @@ const MedicalReportDisplay = ({
         <CardContent>
           {!consultation.transcription ? (
             <div className="text-center py-8">
-              <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 mb-2">No transcription available</p>
-              <p className="text-sm text-gray-500">
+              <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground mb-2">No transcription available</p>
+              <p className="text-sm text-muted-foreground">
                 Complete the audio recording and transcription to generate a
                 medical report
               </p>
             </div>
           ) : !medicalReport?.reportContent ? (
             <div className="text-center py-8">
-              <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 mb-2">
+              <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground mb-2">
                 No medical report generated yet
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 Click "Generate Report" to create a SOAP format medical report
                 with ICD-10 codes
               </p>
@@ -304,11 +304,11 @@ const MedicalReportDisplay = ({
           ) : (
             <div className="space-y-4">
               {/* Report Metadata */}
-              <div className="flex items-center justify-between p-4 bg-blue-50 rounded-md">
+              <div className="flex items-center justify-between p-4 bg-primary/5 rounded-md">
                 <div className="flex items-center space-x-4">
                   <Badge
                     variant="secondary"
-                    className="bg-blue-100 text-blue-800"
+                    className="bg-primary/10 text-primary"
                   >
                     SOAP Format
                   </Badge>
@@ -320,7 +320,7 @@ const MedicalReportDisplay = ({
                   </Badge>
                 </div>
                 {medicalReport.generatedAt && (
-                  <div className="flex items-center text-sm text-gray-600">
+                  <div className="flex items-center text-sm text-muted-foreground">
                     <Calendar className="h-4 w-4 mr-1" />
                     Generated:{" "}
                     {new Date(medicalReport.generatedAt).toLocaleString()}

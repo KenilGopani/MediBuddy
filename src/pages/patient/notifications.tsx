@@ -274,7 +274,7 @@ export default function PatientNotifications() {
     ) {
       return <FileText className="h-5 w-5 text-orange-600" />;
     } else {
-      return <Star className="h-5 w-5 text-blue-600" />;
+      return <Star className="h-5 w-5 text-primary" />;
     }
   };
 
@@ -296,7 +296,7 @@ export default function PatientNotifications() {
   const getTypeColor = (type: string) => {
     switch (type) {
       case "new_match":
-        return "bg-blue-100 text-blue-800";
+        return "bg-primary/10 text-primary";
       case "approved":
         return "bg-green-100 text-green-800";
       case "declined":
@@ -304,7 +304,7 @@ export default function PatientNotifications() {
       case "consent_required":
         return "bg-orange-100 text-orange-800";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-muted text-foreground";
     }
   };
 
@@ -346,22 +346,22 @@ export default function PatientNotifications() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FBFBFD]">
+    <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-8">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-semibold text-[#1D1D1F] mb-2">
+            <h1 className="text-4xl font-extrabold text-foreground mb-2">
               Trial Notifications
             </h1>
-            <p className="text-lg text-[#86868B]">
+            <p className="text-lg text-muted-foreground">
               Stay updated on clinical trial matches and important information
             </p>
           </div>
 
           {/* Filter Tabs */}
-          <div className="flex space-x-1 mb-6 bg-[#F5F5F7] p-1 rounded-lg w-fit">
+          <div className="flex space-x-1 mb-6 bg-muted p-1 rounded-lg w-fit">
             {[
               { key: "all", label: "All" },
               { key: "unread", label: "Unread" },
@@ -372,13 +372,13 @@ export default function PatientNotifications() {
                 onClick={() => setFilter(filterOption.key as any)}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                   filter === filterOption.key
-                    ? "bg-white text-[#1D1D1F] shadow-sm"
-                    : "text-[#86868B] hover:text-[#1D1D1F]"
+                    ? "bg-card text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {filterOption.label}
                 {filterOption.key === "unread" && unreadCount > 0 && (
-                  <span className="ml-2 bg-[#0066CC] text-white text-xs px-2 py-0.5 rounded-full">
+                  <span className="ml-2 bg-primary text-white text-xs px-2 py-0.5 rounded-full">
                     {unreadCount}
                   </span>
                 )}
@@ -395,7 +395,7 @@ export default function PatientNotifications() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Notifications List */}
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold text-[#1D1D1F] mb-4">
+              <h2 className="text-xl font-semibold text-foreground mb-4">
                 Notifications ({filteredNotifications.length})
               </h2>
 
@@ -406,10 +406,10 @@ export default function PatientNotifications() {
                       key={notification.id}
                       className={`cursor-pointer transition-all hover:shadow-lg ${
                         selectedNotificationId === notification.id
-                          ? "ring-2 ring-[#0066CC] bg-[#0066CC]/5"
+                          ? "ring-2 ring-primary bg-primary/5"
                           : notification.notificationStatus === "sent"
-                            ? "bg-white border-l-4 border-l-[#0066CC]"
-                            : "bg-white"
+                            ? "bg-card border-l-4 border-l-primary"
+                            : "bg-card"
                       }`}
                       onClick={() => handleSelectNotification(notification.id)}
                     >
@@ -421,7 +421,7 @@ export default function PatientNotifications() {
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between mb-2">
-                                <h3 className="font-semibold text-[#1D1D1F] text-sm">
+                                <h3 className="font-semibold text-foreground text-sm">
                                   {getNotificationTitle(notification)}
                                 </h3>
                                 <div className="flex items-center space-x-2">
@@ -430,11 +430,11 @@ export default function PatientNotifications() {
                                   )}
                                   {notification.notificationStatus ===
                                     "sent" && (
-                                    <div className="w-2 h-2 bg-[#0066CC] rounded-full"></div>
+                                    <div className="w-2 h-2 bg-primary rounded-full"></div>
                                   )}
                                 </div>
                               </div>
-                              <p className="text-sm text-[#86868B] mb-3">
+                              <p className="text-sm text-muted-foreground mb-3">
                                 {getNotificationDescription(notification)}
                               </p>
                               <div className="flex items-center justify-between">
@@ -448,14 +448,14 @@ export default function PatientNotifications() {
                                     " "
                                   )}
                                 </Badge>
-                                <span className="text-xs text-[#86868B]">
+                                <span className="text-xs text-muted-foreground">
                                   {new Date(
                                     notification.matchDate
                                   ).toLocaleDateString()}
                                 </span>
                                 {agentEnhancedNotifications?.topPriority?.id ===
                                   notification.id && (
-                                  <Badge className="bg-purple-100 text-purple-800 flex items-center">
+                                  <Badge className="bg-accent text-accent-foreground flex items-center">
                                     <BrainCircuit className="h-3 w-3 mr-1" />
                                     Agent Recommended
                                   </Badge>
@@ -468,14 +468,14 @@ export default function PatientNotifications() {
                     </Card>
                   ))
                 ) : (
-                  <Card className="bg-white">
+                  <Card className="bg-card">
                     <CardContent className="flex items-center justify-center py-12">
                       <div className="text-center">
-                        <Bell className="h-12 w-12 text-[#86868B] mx-auto mb-4" />
-                        <h3 className="text-lg font-medium text-[#1D1D1F] mb-2">
+                        <Bell className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                        <h3 className="text-lg font-medium text-foreground mb-2">
                           No notifications found
                         </h3>
-                        <p className="text-[#86868B]">
+                        <p className="text-muted-foreground">
                           {filter === "unread"
                             ? "You're all caught up! No unread notifications."
                             : filter === "action_required"
@@ -487,7 +487,7 @@ export default function PatientNotifications() {
                   </Card>
                 )
               ) : (
-                <Card className="bg-white p-4">
+                <Card className="bg-card p-4">
                   <div className="flex justify-center items-center py-8">
                     <LoadingSpinner />
                   </div>
@@ -498,7 +498,7 @@ export default function PatientNotifications() {
             {/* Notification Details */}
             <div className="sticky top-8">
               {selectedNotification ? (
-                <Card className="bg-white">
+                <Card className="bg-card">
                   <CardHeader>
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-start space-x-3">
@@ -530,16 +530,16 @@ export default function PatientNotifications() {
                   <CardContent className="space-y-6">
                     {/* Trial Overview */}
                     <div>
-                      <h4 className="font-medium text-[#1D1D1F] mb-3 flex items-center">
-                        <Heart className="h-4 w-4 text-[#0066CC] mr-2" />
+                      <h4 className="font-medium text-foreground mb-3 flex items-center">
+                        <Heart className="h-4 w-4 text-primary mr-2" />
                         Trial Information
                       </h4>
-                      <div className="bg-[#F5F5F7] p-4 rounded-lg space-y-3">
+                      <div className="bg-muted p-4 rounded-lg space-y-3">
                         <div>
-                          <h5 className="font-medium text-[#1D1D1F] mb-1">
+                          <h5 className="font-medium text-foreground mb-1">
                             {selectedNotification.trialTitle}
                           </h5>
-                          <div className="flex items-center space-x-4 text-sm text-[#86868B] mb-2">
+                          <div className="flex items-center space-x-4 text-sm text-muted-foreground mb-2">
                             <span>{selectedNotification.trialPhase}</span>
                             <span>•</span>
                             <span>{selectedNotification.trialSponsor}</span>
@@ -550,8 +550,8 @@ export default function PatientNotifications() {
                         </div>
 
                         <div className="flex items-start space-x-2">
-                          <MapPin className="h-4 w-4 text-[#86868B] mt-0.5 flex-shrink-0" />
-                          <span className="text-sm text-[#86868B]">
+                          <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                          <span className="text-sm text-muted-foreground">
                             {selectedNotification.location ||
                               (selectedNotification.locations &&
                               selectedNotification.locations.length > 0
@@ -561,8 +561,8 @@ export default function PatientNotifications() {
                         </div>
 
                         <div className="flex items-start space-x-2">
-                          <Phone className="h-4 w-4 text-[#86868B] mt-0.5 flex-shrink-0" />
-                          <span className="text-sm text-[#86868B]">
+                          <Phone className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                          <span className="text-sm text-muted-foreground">
                             {selectedNotification.contactInfo ||
                               "Contact information not available"}
                           </span>
@@ -572,17 +572,17 @@ export default function PatientNotifications() {
 
                     {/* Study Description */}
                     <div>
-                      <h4 className="font-medium text-[#1D1D1F] mb-2">
+                      <h4 className="font-medium text-foreground mb-2">
                         Study Description
                       </h4>
-                      <p className="text-sm text-[#86868B] leading-relaxed">
+                      <p className="text-sm text-muted-foreground leading-relaxed">
                         {selectedNotification.trialDescription}
                       </p>
                     </div>
 
                     {/* Eligibility Criteria */}
                     <div>
-                      <h4 className="font-medium text-[#1D1D1F] mb-2">
+                      <h4 className="font-medium text-foreground mb-2">
                         Eligibility Criteria
                       </h4>
                       <ul className="space-y-1">
@@ -590,7 +590,7 @@ export default function PatientNotifications() {
                           (criteria, index) => (
                             <li
                               key={index}
-                              className="text-sm text-[#86868B] flex items-start"
+                              className="text-sm text-muted-foreground flex items-start"
                             >
                               <CheckCircle className="h-3 w-3 text-green-600 mr-2 mt-1 flex-shrink-0" />
                               {criteria}
@@ -601,7 +601,7 @@ export default function PatientNotifications() {
                           (criteria, index) => (
                             <li
                               key={`inclusion-${index}`}
-                              className="text-sm text-[#86868B] flex items-start"
+                              className="text-sm text-muted-foreground flex items-start"
                             >
                               <CheckCircle className="h-3 w-3 text-green-600 mr-2 mt-1 flex-shrink-0" />
                               {criteria}
@@ -614,13 +614,13 @@ export default function PatientNotifications() {
                     {/* Doctor Notes */}
                     {selectedNotification.doctorNotes && (
                       <div>
-                        <h4 className="font-medium text-[#1D1D1F] mb-2">
+                        <h4 className="font-medium text-foreground mb-2">
                           Doctor's Notes
                         </h4>
-                        <div className="bg-blue-50 p-3 rounded-lg">
+                        <div className="bg-primary/5 p-3 rounded-lg">
                           <div className="flex items-start space-x-2">
-                            <Info className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                            <p className="text-sm text-blue-800">
+                            <Info className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                            <p className="text-sm text-primary">
                               {selectedNotification.doctorNotes}
                             </p>
                           </div>
@@ -632,7 +632,7 @@ export default function PatientNotifications() {
                     {selectedNotification.consentStatus === "pending" && (
                       <div className="pt-4 border-t">
                         <div className="space-y-3">
-                          <p className="text-sm text-[#86868B] mb-3">
+                          <p className="text-sm text-muted-foreground mb-3">
                             Are you interested in participating in this clinical
                             trial?
                           </p>
@@ -652,7 +652,7 @@ export default function PatientNotifications() {
                                   "approved"
                                 )
                               }
-                              className="flex-1 bg-[#0066CC] hover:bg-[#0077ED]"
+                              className="flex-1 bg-primary hover:bg-primary/90"
                               disabled={isSubmitting}
                             >
                               {isSubmitting ? (
@@ -689,8 +689,8 @@ export default function PatientNotifications() {
                     {selectedNotification.consentStatus !== "pending" && (
                       <div className="pt-4 border-t">
                         <div className="space-y-3">
-                          <p className="text-sm font-medium text-[#1D1D1F] flex items-center">
-                            <MessageSquarePlus className="h-4 w-4 mr-2 text-[#0066CC]" />
+                          <p className="text-sm font-medium text-foreground flex items-center">
+                            <MessageSquarePlus className="h-4 w-4 mr-2 text-primary" />
                             Have a question about this trial?
                           </p>
 
@@ -703,7 +703,7 @@ export default function PatientNotifications() {
 
                           <Button
                             onClick={handleAskQuestion}
-                            className="w-full bg-[#0066CC] hover:bg-[#0077ED]"
+                            className="w-full bg-primary hover:bg-primary/90"
                             disabled={isAskingQuestion || !questionText.trim()}
                           >
                             {isAskingQuestion ? (
@@ -737,7 +737,7 @@ export default function PatientNotifications() {
                               research team will contact you soon.
                             </p>
                           </div>
-                          <Button className="w-full bg-[#0066CC] hover:bg-[#0077ED]">
+                          <Button className="w-full bg-primary hover:bg-primary/90">
                             <Phone className="h-4 w-4 mr-2" />
                             Contact Research Team
                           </Button>
@@ -749,11 +749,11 @@ export default function PatientNotifications() {
                       selectedNotification.type === "consent_required" && (
                         <div className="pt-4 border-t">
                           <div className="space-y-3">
-                            <p className="text-sm text-[#86868B]">
+                            <p className="text-sm text-muted-foreground">
                               Please review the informed consent document before
                               proceeding.
                             </p>
-                            <Button className="w-full bg-[#0066CC] hover:bg-[#0077ED]">
+                            <Button className="w-full bg-primary hover:bg-primary/90">
                               <FileText className="h-4 w-4 mr-2" />
                               Review Consent Form
                             </Button>
@@ -777,14 +777,14 @@ export default function PatientNotifications() {
                   </CardContent>
                 </Card>
               ) : (
-                <Card className="bg-white">
+                <Card className="bg-card">
                   <CardContent className="flex items-center justify-center py-12">
                     <div className="text-center">
-                      <Bell className="h-12 w-12 text-[#86868B] mx-auto mb-4" />
-                      <h3 className="text-lg font-medium text-[#1D1D1F] mb-2">
+                      <Bell className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-lg font-medium text-foreground mb-2">
                         Select a Notification
                       </h3>
-                      <p className="text-[#86868B]">
+                      <p className="text-muted-foreground">
                         Choose a notification from the list to view details and
                         take action
                       </p>

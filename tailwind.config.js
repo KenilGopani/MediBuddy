@@ -17,7 +17,13 @@ module.exports = {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['"Atkinson Hyperlegible"', "ui-sans-serif", "system-ui", "sans-serif"],
+        display: ['"Bricolage Grotesque"', '"Atkinson Hyperlegible"', "ui-sans-serif", "sans-serif"],
+      },
       colors: {
+        marker: "hsl(var(--marker))",
+        signal: "hsl(var(--signal))",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

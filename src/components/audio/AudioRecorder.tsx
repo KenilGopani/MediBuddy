@@ -226,7 +226,7 @@ const AudioRecorder = ({
     <div className="space-y-4">
       {/* Audio Visualizer */}
       {isRecording && (
-        <div className="h-20 bg-gray-100 rounded-md overflow-hidden">
+        <div className="h-20 bg-muted rounded-md overflow-hidden">
           {analyserRef.current && (
             <AudioVisualizer analyser={analyserRef.current} />
           )}
@@ -235,23 +235,23 @@ const AudioRecorder = ({
 
       {/* Timer Display */}
       <div className="text-center">
-        <div className="text-3xl font-mono text-[#1D1D1F] mb-2">
+        <div className="text-3xl font-mono text-foreground mb-2">
           {formatTime(recordingTime)}
         </div>
         {isRecording && (
           <div className="flex items-center justify-center space-x-2">
             <div
               className={`w-3 h-3 rounded-full ${
-                isPaused ? "bg-yellow-500" : "bg-red-500 animate-pulse"
+                isPaused ? "bg-yellow-500" : "bg-signal animate-pulse"
               }`}
             ></div>
-            <span className="text-sm text-[#86868B]">
+            <span className="text-sm text-muted-foreground">
               {isPaused ? "Paused" : "Recording"}
             </span>
           </div>
         )}
         {isUploading && (
-          <div className="text-sm text-blue-500 mt-2">
+          <div className="text-sm text-primary mt-2">
             Uploading recording...
           </div>
         )}
@@ -262,7 +262,7 @@ const AudioRecorder = ({
         {!isRecording ? (
           <Button
             onClick={startRecording}
-            className="bg-[#0066CC] hover:bg-[#0077ED]"
+            className="bg-primary hover:bg-primary/90"
             disabled={isUploading}
           >
             <Mic className="h-4 w-4 mr-2" />
@@ -282,7 +282,7 @@ const AudioRecorder = ({
             ) : (
               <Button
                 onClick={resumeRecording}
-                className="bg-[#0066CC] hover:bg-[#0077ED]"
+                className="bg-primary hover:bg-primary/90"
                 disabled={isUploading}
               >
                 <Play className="h-4 w-4 mr-2" />

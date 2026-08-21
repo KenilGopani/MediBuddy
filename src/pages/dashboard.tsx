@@ -13,14 +13,14 @@ export default function Dashboard() {
     );
 
     return (
-        <div className="min-h-screen flex flex-col bg-[#FBFBFD]">
+        <div className="min-h-screen flex flex-col bg-background">
             <Navbar />
             <main className="flex-grow">
                 <div className="container mx-auto px-4 py-16">
                     <div className="relative mb-12">
-                        <div className="absolute inset-x-0 -top-16 -bottom-16 bg-gradient-to-b from-[#FBFBFD] via-white to-[#FBFBFD] opacity-80 blur-3xl -z-10" />
-                        <h1 className="text-4xl font-semibold text-[#1D1D1F] tracking-tight mb-4">Your Dashboard</h1>
-                        <p className="text-xl text-[#86868B] max-w-[600px] leading-relaxed mb-8">
+                        <div className="absolute inset-x-0 -top-16 -bottom-16 bg-gradient-to-b from-background via-white to-background opacity-80 blur-3xl -z-10" />
+                        <h1 className="text-4xl font-semibold text-foreground tracking-tight mb-4">Your Dashboard</h1>
+                        <p className="text-xl text-muted-foreground max-w-[600px] leading-relaxed mb-8">
                             View and manage your account information and user data in one place.
                         </p>
                     </div>
@@ -29,7 +29,7 @@ export default function Dashboard() {
                         {/* Clerk User Data */}
                         <DataCard 
                             title="Clerk User Information"
-                            icon={<User className="h-5 w-5 text-[#0066CC]" />}
+                            icon={<User className="h-5 w-5 text-primary" />}
                         >
                             <div className="space-y-2">
                                 <DataRow label="Full Name" value={user?.fullName} />
@@ -46,7 +46,7 @@ export default function Dashboard() {
                         {/* Database User Data */}
                         <DataCard 
                             title="Database User Information"
-                            icon={<Database className="h-5 w-5 text-[#0066CC]" />}
+                            icon={<Database className="h-5 w-5 text-primary" />}
                         >
                             <div className="space-y-2">
                                 <DataRow label="Database ID" value={userData?._id} />
@@ -63,7 +63,7 @@ export default function Dashboard() {
                         {/* Session Information */}
                         <DataCard 
                             title="Current Session"
-                            icon={<Clock className="h-5 w-5 text-[#0066CC]" />}
+                            icon={<Clock className="h-5 w-5 text-primary" />}
                         >
                             <div className="space-y-2">
                                 <DataRow label="Last Active" value={new Date(user?.lastSignInAt || "").toLocaleString()} />
@@ -74,7 +74,7 @@ export default function Dashboard() {
                         {/* Additional User Details */}
                         <DataCard 
                             title="Profile Details"
-                            icon={<Shield className="h-5 w-5 text-[#0066CC]" />}
+                            icon={<Shield className="h-5 w-5 text-primary" />}
                         >
                             <div className="space-y-2">
                                 <DataRow label="Username" value={user?.username} />
@@ -92,18 +92,18 @@ export default function Dashboard() {
                     <div className="mt-12">
                         <DataCard 
                             title="Raw Data Preview"
-                            className="bg-gradient-to-br from-[#F5F5F7] to-white"
+                            className="bg-gradient-to-br from-muted to-white"
                         >
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <h3 className="text-sm font-medium text-[#1D1D1F] mb-2">Clerk User Data</h3>
-                                    <pre className="bg-white/80 p-4 rounded-[14px] text-sm overflow-auto max-h-64 border border-[#E5E5EA]">
+                                    <h3 className="text-sm font-medium text-foreground mb-2">Clerk User Data</h3>
+                                    <pre className="bg-white/80 p-4 rounded-[14px] text-sm overflow-auto max-h-64 border border-border">
                                         {JSON.stringify(user, null, 2)}
                                     </pre>
                                 </div>
                                 <div>
-                                    <h3 className="text-sm font-medium text-[#1D1D1F] mb-2">Database User Data</h3>
-                                    <pre className="bg-white/80 p-4 rounded-[14px] text-sm overflow-auto max-h-64 border border-[#E5E5EA]">
+                                    <h3 className="text-sm font-medium text-foreground mb-2">Database User Data</h3>
+                                    <pre className="bg-white/80 p-4 rounded-[14px] text-sm overflow-auto max-h-64 border border-border">
                                         {JSON.stringify(userData, null, 2)}
                                     </pre>
                                 </div>
@@ -130,10 +130,10 @@ function DataCard({
     className?: string;
 }) {
     return (
-        <div className={`bg-white rounded-[20px] shadow-sm p-6 transition-all hover:shadow-md ${className}`}>
+        <div className={`bg-card rounded-[20px] shadow-sm p-6 transition-all hover:shadow-md ${className}`}>
             <div className="flex items-center gap-2 mb-4">
                 {icon && <div className="flex-shrink-0">{icon}</div>}
-                <h2 className="text-lg font-semibold text-[#1D1D1F]">{title}</h2>
+                <h2 className="text-lg font-semibold text-foreground">{title}</h2>
             </div>
             {children}
         </div>
@@ -142,9 +142,9 @@ function DataCard({
 
 function DataRow({ label, value }: { label: string; value: string | number | null | undefined }) {
     return (
-        <div className="flex justify-between py-2 border-b border-[#F5F5F7] last:border-0">
-            <span className="text-[#86868B]">{label}</span>
-            <span className="text-[#1D1D1F] font-medium">{value || "—"}</span>
+        <div className="flex justify-between py-2 border-b border-border last:border-0">
+            <span className="text-muted-foreground">{label}</span>
+            <span className="text-foreground font-medium">{value || "—"}</span>
         </div>
     );
 }
@@ -170,7 +170,7 @@ function StatusBadge({ status }: { status: string | undefined }) {
             case "canceled":
                 return "bg-[#FFEAEA] text-[#D93025]";
             default:
-                return "bg-[#F5F5F7] text-[#86868B]";
+                return "bg-muted text-muted-foreground";
         }
     };
 

@@ -191,13 +191,13 @@ export default function PatientDashboard() {
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case "new_match":
-        return <Star className="h-4 w-4 text-blue-600" />;
+        return <Star className="h-4 w-4 text-primary" />;
       case "approved":
         return <CheckCircle className="h-4 w-4 text-green-600" />;
       case "consent_required":
         return <FileText className="h-4 w-4 text-orange-600" />;
       default:
-        return <Bell className="h-4 w-4 text-gray-600" />;
+        return <Bell className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
@@ -206,25 +206,25 @@ export default function PatientDashboard() {
       case "enrolled":
         return "bg-green-100 text-green-800";
       case "screening":
-        return "bg-blue-100 text-blue-800";
+        return "bg-primary/10 text-primary";
       case "pending":
         return "bg-yellow-100 text-yellow-800";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-muted text-foreground";
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FBFBFD]">
+    <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-8">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-semibold text-[#1D1D1F] mb-2">
+            <h1 className="text-4xl font-extrabold text-foreground mb-2">
               Welcome, {userData?.name?.split(" ")[0] || "Patient"}
             </h1>
-            <p className="text-lg text-[#86868B]">
+            <p className="text-lg text-muted-foreground">
               Your personalized health dashboard and clinical trial information
             </p>
           </div>
@@ -232,18 +232,18 @@ export default function PatientDashboard() {
           {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             <Link to="/patient/active-trials">
-              <Card className="cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02] bg-white">
+              <Card className="cursor-pointer transition-all hover:shadow-lg hover:-translate-y-0.5 bg-card">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-[#86868B]">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
                     Active Trials
                   </CardTitle>
-                  <Activity className="h-4 w-4 text-[#0066CC]" />
+                  <Activity className="h-4 w-4 text-primary" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-[#1D1D1F]">
+                  <div className="font-display text-4xl font-extrabold text-foreground">
                     {patientStats.activeTrials}
                   </div>
-                  <p className="text-xs text-[#86868B] mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     Currently participating
                   </p>
                 </CardContent>
@@ -251,18 +251,18 @@ export default function PatientDashboard() {
             </Link>
 
             <Link to="/patient/notifications">
-              <Card className="cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02] bg-white">
+              <Card className="cursor-pointer transition-all hover:shadow-lg hover:-translate-y-0.5 bg-card">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-[#86868B]">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
                     Notifications
                   </CardTitle>
-                  <Bell className="h-4 w-4 text-[#0066CC]" />
+                  <Bell className="h-4 w-4 text-primary" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-[#1D1D1F]">
+                  <div className="font-display text-4xl font-extrabold text-foreground">
                     {patientStats.pendingNotifications}
                   </div>
-                  <p className="text-xs text-[#86868B] mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     Require attention
                   </p>
                 </CardContent>
@@ -270,18 +270,18 @@ export default function PatientDashboard() {
             </Link>
 
             <Link to="/patient/appointments">
-              <Card className="cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02] bg-white">
+              <Card className="cursor-pointer transition-all hover:shadow-lg hover:-translate-y-0.5 bg-card">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-[#86868B]">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
                     Appointments
                   </CardTitle>
-                  <Calendar className="h-4 w-4 text-[#0066CC]" />
+                  <Calendar className="h-4 w-4 text-primary" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-[#1D1D1F]">
+                  <div className="font-display text-4xl font-extrabold text-foreground">
                     {patientStats.upcomingAppointments}
                   </div>
-                  <p className="text-xs text-[#86868B] mt-1">This week</p>
+                  <p className="text-xs text-muted-foreground mt-1">This week</p>
                 </CardContent>
               </Card>
             </Link>
@@ -290,11 +290,11 @@ export default function PatientDashboard() {
           {/* Quick Actions */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <Link to="/patient/reports">
-              <Card className="cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02] bg-white">
+              <Card className="cursor-pointer transition-all hover:shadow-lg hover:-translate-y-0.5 bg-card">
                 <CardHeader>
                   <div className="flex items-center space-x-3">
-                    <div className="p-2 rounded-full bg-[#0066CC]/10">
-                      <FileText className="h-6 w-6 text-[#0066CC]" />
+                    <div className="p-2.5 rounded-xl bg-primary/10">
+                      <FileText className="h-6 w-6 text-primary" />
                     </div>
                     <div>
                       <CardTitle>Medical Reports</CardTitle>
@@ -308,11 +308,11 @@ export default function PatientDashboard() {
             </Link>
 
             <Link to="/patient/consent">
-              <Card className="cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02] bg-white">
+              <Card className="cursor-pointer transition-all hover:shadow-lg hover:-translate-y-0.5 bg-card">
                 <CardHeader>
                   <div className="flex items-center space-x-3">
-                    <div className="p-2 rounded-full bg-[#0066CC]/10">
-                      <FileText className="h-6 w-6 text-[#0066CC]" />
+                    <div className="p-2.5 rounded-xl bg-primary/10">
+                      <FileText className="h-6 w-6 text-primary" />
                     </div>
                     <div>
                       <CardTitle>Consent Forms</CardTitle>
@@ -328,12 +328,12 @@ export default function PatientDashboard() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Medical Profile */}
-            <Card className="bg-white">
+            <Card className="bg-card">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="flex items-center space-x-2">
-                      <Heart className="h-5 w-5 text-[#0066CC]" />
+                      <Heart className="h-5 w-5 text-primary" />
                       <span>Medical Profile</span>
                     </CardTitle>
                     <CardDescription>
@@ -342,10 +342,10 @@ export default function PatientDashboard() {
                     </CardDescription>
                     <div className="mt-3">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-[#86868B]">
+                        <span className="text-sm text-muted-foreground">
                           Profile Completion
                         </span>
-                        <span className="text-sm font-medium text-[#0066CC]">
+                        <span className="text-sm font-medium text-primary">
                           {profileCompletionPercentage || 0}%
                         </span>
                       </div>
@@ -367,7 +367,7 @@ export default function PatientDashboard() {
                 <div>
                   <div className="flex items-center space-x-2 mb-3">
                     <Heart className="h-4 w-4 text-red-500" />
-                    <span className="font-medium text-[#1D1D1F]">
+                    <span className="font-medium text-foreground">
                       Conditions
                     </span>
                   </div>
@@ -383,7 +383,7 @@ export default function PatientDashboard() {
                         </Badge>
                       ))
                     ) : (
-                      <p className="text-sm text-[#86868B]">
+                      <p className="text-sm text-muted-foreground">
                         No conditions recorded
                       </p>
                     )}
@@ -392,8 +392,8 @@ export default function PatientDashboard() {
 
                 <div>
                   <div className="flex items-center space-x-2 mb-3">
-                    <Pill className="h-4 w-4 text-blue-500" />
-                    <span className="font-medium text-[#1D1D1F]">
+                    <Pill className="h-4 w-4 text-primary" />
+                    <span className="font-medium text-foreground">
                       Current Medications
                     </span>
                   </div>
@@ -402,13 +402,13 @@ export default function PatientDashboard() {
                       medicalProfile.medications.map((medication, index) => (
                         <Badge
                           key={index}
-                          className="bg-blue-100 text-blue-800 text-sm"
+                          className="bg-primary/10 text-primary text-sm"
                         >
                           {medication}
                         </Badge>
                       ))
                     ) : (
-                      <p className="text-sm text-[#86868B]">
+                      <p className="text-sm text-muted-foreground">
                         No medications recorded
                       </p>
                     )}
@@ -418,7 +418,7 @@ export default function PatientDashboard() {
                 <div>
                   <div className="flex items-center space-x-2 mb-3">
                     <AlertCircle className="h-4 w-4 text-orange-500" />
-                    <span className="font-medium text-[#1D1D1F]">
+                    <span className="font-medium text-foreground">
                       Allergies
                     </span>
                   </div>
@@ -433,7 +433,7 @@ export default function PatientDashboard() {
                         </Badge>
                       ))
                     ) : (
-                      <p className="text-sm text-[#86868B]">
+                      <p className="text-sm text-muted-foreground">
                         No allergies recorded
                       </p>
                     )}
@@ -451,10 +451,10 @@ export default function PatientDashboard() {
             </Card>
 
             {/* Upcoming Appointments */}
-            <Card className="bg-white">
+            <Card className="bg-card">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <Calendar className="h-5 w-5 text-[#0066CC]" />
+                  <Calendar className="h-5 w-5 text-primary" />
                   <span>Upcoming Appointments</span>
                 </CardTitle>
                 <CardDescription>
@@ -467,17 +467,17 @@ export default function PatientDashboard() {
                     upcomingMeetings.map((meeting) => (
                       <div
                         key={meeting._id}
-                        className="p-4 rounded-lg bg-[#F5F5F7] border border-gray-200"
+                        className="p-4 rounded-lg bg-muted border border-border"
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <h4 className="font-medium text-[#1D1D1F] mb-1">
+                            <h4 className="font-medium text-foreground mb-1">
                               {meeting.title || "Medical Appointment"}
                             </h4>
-                            <p className="text-sm text-[#86868B] mb-2">
+                            <p className="text-sm text-muted-foreground mb-2">
                               {meeting.description || "No description provided"}
                             </p>
-                            <div className="flex items-center space-x-4 text-sm text-[#86868B]">
+                            <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                               <div className="flex items-center space-x-1">
                                 <Calendar className="h-3 w-3" />
                                 <span>
@@ -506,14 +506,14 @@ export default function PatientDashboard() {
                             <Badge variant="outline" className="text-xs">
                               {meeting.type || "consultation"}
                             </Badge>
-                            <Badge className="bg-blue-100 text-blue-800">
+                            <Badge className="bg-primary/10 text-primary">
                               {meeting.status}
                             </Badge>
                           </div>
                         </div>
                         {meeting.location && (
-                          <div className="mt-3 pt-3 border-t border-gray-200">
-                            <p className="text-sm text-[#86868B]">
+                          <div className="mt-3 pt-3 border-t border-border">
+                            <p className="text-sm text-muted-foreground">
                               <strong>Location:</strong> {meeting.location}
                             </p>
                           </div>
@@ -522,9 +522,9 @@ export default function PatientDashboard() {
                     ))
                   ) : (
                     <div className="text-center py-6">
-                      <Calendar className="h-8 w-8 text-[#86868B] mx-auto mb-2 opacity-50" />
-                      <p className="text-[#86868B]">No upcoming appointments</p>
-                      <p className="text-xs text-[#86868B] mt-1">
+                      <Calendar className="h-8 w-8 text-muted-foreground mx-auto mb-2 opacity-50" />
+                      <p className="text-muted-foreground">No upcoming appointments</p>
+                      <p className="text-xs text-muted-foreground mt-1">
                         Your doctor will schedule appointments as needed
                       </p>
                     </div>

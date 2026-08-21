@@ -91,16 +91,16 @@ export default function PatientReports() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FBFBFD]">
+    <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-8">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-semibold text-[#1D1D1F] mb-2">
+            <h1 className="text-4xl font-extrabold text-foreground mb-2">
               Medical Reports
             </h1>
-            <p className="text-lg text-[#86868B]">
+            <p className="text-lg text-muted-foreground">
               View and download your shared consultation reports
             </p>
           </div>
@@ -112,16 +112,16 @@ export default function PatientReports() {
                 <LoadingSpinner className="h-8 w-8" />
               </div>
             ) : sharedConsultations.length === 0 ? (
-              <Card className="bg-white">
+              <Card className="bg-card">
                 <CardContent className="text-center py-12">
-                  <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-[#1D1D1F] mb-2">
+                  <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-foreground mb-2">
                     No Shared Reports
                   </h3>
-                  <p className="text-[#86868B] mb-4">
+                  <p className="text-muted-foreground mb-4">
                     You don't have any shared consultation reports yet.
                   </p>
-                  <p className="text-sm text-[#86868B]">
+                  <p className="text-sm text-muted-foreground">
                     Your doctor will share consultation reports with you after
                     appointments.
                   </p>
@@ -136,31 +136,31 @@ export default function PatientReports() {
                 .map((consultation) => (
                   <Card
                     key={consultation._id}
-                    className="bg-white hover:shadow-lg transition-shadow"
+                    className="bg-card hover:shadow-lg transition-shadow"
                   >
                     <CardHeader className="pb-4">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <CardTitle className="flex items-center space-x-2 mb-2">
-                            <FileText className="h-5 w-5 text-[#0066CC]" />
+                            <FileText className="h-5 w-5 text-primary" />
                             <span>Medical Consultation Report</span>
                           </CardTitle>
                           <CardDescription className="space-y-1">
                             <div className="flex items-center space-x-4 text-sm">
                               <div className="flex items-center space-x-1">
-                                <User className="h-4 w-4 text-gray-500" />
+                                <User className="h-4 w-4 text-muted-foreground" />
                                 <span>
                                   Dr. {getDoctorName(consultation.doctorId)}
                                 </span>
                               </div>
                               <div className="flex items-center space-x-1">
-                                <Calendar className="h-4 w-4 text-gray-500" />
+                                <Calendar className="h-4 w-4 text-muted-foreground" />
                                 <span>
                                   {formatDate(consultation.startTime)}
                                 </span>
                               </div>
                               <div className="flex items-center space-x-1">
-                                <Clock className="h-4 w-4 text-gray-500" />
+                                <Clock className="h-4 w-4 text-muted-foreground" />
                                 <span>
                                   {formatTime(consultation.startTime)}
                                 </span>
@@ -188,7 +188,7 @@ export default function PatientReports() {
                           {consultation.medicalReport && (
                             <Badge
                               variant="outline"
-                              className="bg-blue-50 text-blue-700 border-blue-200"
+                              className="bg-primary/5 text-primary border-primary/25"
                             >
                               Report Available
                             </Badge>
@@ -199,7 +199,7 @@ export default function PatientReports() {
 
                     <CardContent className="pt-0">
                       <div className="flex items-center justify-between">
-                        <p className="text-sm text-[#86868B]">
+                        <p className="text-sm text-muted-foreground">
                           {consultation.medicalReport
                             ? "Medical report and consultation details are available"
                             : "Consultation completed, report being prepared"}
@@ -210,7 +210,7 @@ export default function PatientReports() {
                               variant="outline"
                               size="sm"
                               onClick={() => handleDownloadReport(consultation)}
-                              className="text-gray-600 hover:text-gray-900"
+                              className="text-muted-foreground hover:text-foreground"
                             >
                               <Download className="h-4 w-4 mr-2" />
                               Download
@@ -221,7 +221,7 @@ export default function PatientReports() {
                           >
                             <Button
                               size="sm"
-                              className="bg-[#0066CC] hover:bg-[#0077ED]"
+                              className="bg-primary hover:bg-primary/90"
                             >
                               <Eye className="h-4 w-4 mr-2" />
                               View Report

@@ -1,10 +1,15 @@
+import { Logo } from "@/components/ui/logo";
+
 export function LoadingSpinner() {
-    return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-50">
-            <div className="flex flex-col items-center space-y-4">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                <p className="text-gray-500">Loading...</p>
-            </div>
-        </div>
-    );
+  return (
+    <div
+      className="flex items-center justify-center min-h-screen bg-background"
+      role="status"
+    >
+      <div className="flex flex-col items-center gap-4">
+        <Logo size={44} className="animate-pulse" />
+        <p className="text-muted-foreground">Loading your workspace…</p>
+      </div>
+    </div>
+  );
 }

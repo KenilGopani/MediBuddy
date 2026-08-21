@@ -204,7 +204,7 @@ export default function DoctorTrialMatching() {
       case "declined":
         return <XCircle className="h-4 w-4 text-red-600" />;
       case "enrolled":
-        return <Star className="h-4 w-4 text-purple-600" />;
+        return <Star className="h-4 w-4 text-accent-foreground" />;
       default:
         return <Clock className="h-4 w-4 text-yellow-600" />;
     }
@@ -213,11 +213,11 @@ export default function DoctorTrialMatching() {
   const getNotificationStatusIcon = (status: string) => {
     switch (status) {
       case "sent":
-        return <Bell className="h-4 w-4 text-blue-600" />;
+        return <Bell className="h-4 w-4 text-primary" />;
       case "viewed":
-        return <CheckCircle className="h-4 w-4 text-blue-600" />;
+        return <CheckCircle className="h-4 w-4 text-primary" />;
       default:
-        return <AlertCircle className="h-4 w-4 text-gray-600" />;
+        return <AlertCircle className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
@@ -228,7 +228,7 @@ export default function DoctorTrialMatching() {
       case "declined":
         return "bg-red-100 text-red-800";
       case "enrolled":
-        return "bg-purple-100 text-purple-800";
+        return "bg-accent text-accent-foreground";
       default:
         return "bg-yellow-100 text-yellow-800";
     }
@@ -252,7 +252,7 @@ export default function DoctorTrialMatching() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FBFBFD]">
+    <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-8">
@@ -260,10 +260,10 @@ export default function DoctorTrialMatching() {
           <div className="mb-8">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-semibold text-[#1D1D1F] mb-2">
+                <h1 className="text-4xl font-extrabold text-foreground mb-2">
                   Clinical Trial Matching
                 </h1>
-                <p className="text-lg text-[#86868B]">
+                <p className="text-lg text-muted-foreground">
                   Review AI-generated trial matches for your patients and
                   approve suitable opportunities
                 </p>
@@ -280,7 +280,7 @@ export default function DoctorTrialMatching() {
           </div>
 
           {/* Filter Tabs */}
-          <div className="flex flex-wrap space-x-1 mb-6 bg-[#F5F5F7] p-1 rounded-lg w-fit">
+          <div className="flex flex-wrap space-x-1 mb-6 bg-muted p-1 rounded-lg w-fit">
             {["pending", "approved", "declined", "enrolled", "all"].map(
               (status) => (
                 <button
@@ -288,8 +288,8 @@ export default function DoctorTrialMatching() {
                   onClick={() => setFilter(status as any)}
                   className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                     filter === status
-                      ? "bg-white text-[#1D1D1F] shadow-sm"
-                      : "text-[#86868B] hover:text-[#1D1D1F]"
+                      ? "bg-card text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -307,17 +307,17 @@ export default function DoctorTrialMatching() {
 
           {/* Bulk Actions */}
           {selectedTrials.length > 0 && (
-            <div className="mb-6 p-3 bg-blue-50 rounded-lg flex items-center justify-between">
+            <div className="mb-6 p-3 bg-primary/5 rounded-lg flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <Bell className="h-5 w-5 text-blue-600" />
-                <span className="text-blue-800 font-medium">
+                <Bell className="h-5 w-5 text-primary" />
+                <span className="text-primary font-medium">
                   {selectedTrials.length} trials selected
                 </span>
               </div>
               <Button
                 onClick={handleSendBulkNotifications}
                 disabled={isSubmitting}
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-primary hover:bg-primary/90"
               >
                 {isSubmitting ? (
                   <LoadingSpinner className="mr-2 h-4 w-4" />
@@ -333,7 +333,7 @@ export default function DoctorTrialMatching() {
             {/* Trial Matches List */}
             <div className="space-y-4">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-[#1D1D1F]">
+                <h2 className="text-xl font-semibold text-foreground">
                   Trial Matches ({trialMatches?.length || 0})
                 </h2>
 
@@ -357,20 +357,20 @@ export default function DoctorTrialMatching() {
               </div>
 
               {!trialMatches ? (
-                <Card className="bg-white p-4">
+                <Card className="bg-card p-4">
                   <div className="flex justify-center items-center py-8">
                     <LoadingSpinner />
                   </div>
                 </Card>
               ) : trialMatches.length === 0 ? (
-                <Card className="bg-white">
+                <Card className="bg-card">
                   <CardContent className="flex items-center justify-center py-12">
                     <div className="text-center">
-                      <Search className="h-12 w-12 text-[#86868B] mx-auto mb-4" />
-                      <h3 className="text-lg font-medium text-[#1D1D1F] mb-2">
+                      <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-lg font-medium text-foreground mb-2">
                         No Trial Matches Found
                       </h3>
-                      <p className="text-[#86868B]">
+                      <p className="text-muted-foreground">
                         {filter === "pending"
                           ? "No pending trial matches to review."
                           : filter === "approved"
@@ -390,8 +390,8 @@ export default function DoctorTrialMatching() {
                     key={match.match._id}
                     className={`cursor-pointer transition-all hover:shadow-lg mb-4 ${
                       selectedMatchId === match.match._id
-                        ? "ring-2 ring-[#0066CC] bg-[#0066CC]/5"
-                        : "bg-white"
+                        ? "ring-2 ring-primary bg-primary/5"
+                        : "bg-card"
                     }`}
                     onClick={() => setSelectedMatchId(match.match._id)}
                   >
@@ -399,17 +399,17 @@ export default function DoctorTrialMatching() {
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center space-x-2 mb-1">
-                            <User className="h-4 w-4 text-[#0066CC]" />
-                            <span className="font-semibold text-[#1D1D1F]">
+                            <User className="h-4 w-4 text-primary" />
+                            <span className="font-semibold text-foreground">
                               {match.patient.name}
                             </span>
-                            <span className="text-sm text-[#86868B]">
+                            <span className="text-sm text-muted-foreground">
                               ({match.patient.id})
                             </span>
                             {filter === "pending" && (
                               <input
                                 type="checkbox"
-                                className="ml-2 h-4 w-4 rounded border-gray-300 text-[#0066CC] focus:ring-[#0066CC]"
+                                className="ml-2 h-4 w-4 rounded border-border text-primary focus:ring-primary"
                                 checked={selectedTrials.includes(
                                   match.match._id
                                 )}
@@ -421,7 +421,7 @@ export default function DoctorTrialMatching() {
                               />
                             )}
                           </div>
-                          <h3 className="font-medium text-[#1D1D1F] mb-2 line-clamp-2">
+                          <h3 className="font-medium text-foreground mb-2 line-clamp-2">
                             {match.trial.title}
                           </h3>
                         </div>
@@ -441,7 +441,7 @@ export default function DoctorTrialMatching() {
                         </div>
                       </div>
 
-                      <div className="flex items-center space-x-4 text-sm text-[#86868B]">
+                      <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                         <div className="flex items-center space-x-1">
                           <FileText className="h-3 w-3" />
                           <span>{match.trial.phase}</span>
@@ -488,7 +488,7 @@ export default function DoctorTrialMatching() {
                             .map((factor, index) => (
                               <Badge
                                 key={index}
-                                className="bg-[#0066CC]/10 text-[#0066CC] text-xs"
+                                className="bg-primary/10 text-primary text-xs"
                               >
                                 <Star className="h-3 w-3 mr-1" />
                                 {factor}
@@ -511,7 +511,7 @@ export default function DoctorTrialMatching() {
             {/* Trial Details */}
             <div className="sticky top-8">
               {selectedMatch ? (
-                <Card className="bg-white">
+                <Card className="bg-card">
                   <CardHeader>
                     <div className="flex items-start justify-between mb-2">
                       <div>
@@ -558,14 +558,14 @@ export default function DoctorTrialMatching() {
 
                     {/* Patient Info */}
                     <div>
-                      <h4 className="font-medium text-[#1D1D1F] mb-2">
+                      <h4 className="font-medium text-foreground mb-2">
                         Patient Information
                       </h4>
-                      <div className="bg-[#F5F5F7] p-3 rounded-lg">
+                      <div className="bg-muted p-3 rounded-lg">
                         <div className="font-medium">
                           {selectedMatch.patient.name}
                         </div>
-                        <div className="text-sm text-[#86868B] mb-2">
+                        <div className="text-sm text-muted-foreground mb-2">
                           ID:{" "}
                           {selectedMatch.patient.id.toString().substring(0, 8)}
                           {selectedMatch.patient.age &&
@@ -595,8 +595,8 @@ export default function DoctorTrialMatching() {
                     {(selectedMatch.match.consentStatus !== "pending" ||
                       selectedMatch.match.patientResponse) && (
                       <div>
-                        <h4 className="font-medium text-[#1D1D1F] mb-2 flex items-center">
-                          <MessageCircle className="h-4 w-4 text-[#0066CC] mr-2" />
+                        <h4 className="font-medium text-foreground mb-2 flex items-center">
+                          <MessageCircle className="h-4 w-4 text-primary mr-2" />
                           Patient Response
                         </h4>
                         <div
@@ -605,7 +605,7 @@ export default function DoctorTrialMatching() {
                               ? "bg-green-50"
                               : selectedMatch.match.consentStatus === "declined"
                                 ? "bg-red-50"
-                                : "bg-blue-50"
+                                : "bg-primary/5"
                           }`}
                         >
                           <p
@@ -615,13 +615,13 @@ export default function DoctorTrialMatching() {
                                 : selectedMatch.match.consentStatus ===
                                     "declined"
                                   ? "text-red-800"
-                                  : "text-blue-800"
+                                  : "text-primary"
                             }`}
                           >
                             {getResponseText(selectedMatch)}
                           </p>
                           {selectedMatch.match.responseDate && (
-                            <p className="text-xs mt-2 text-gray-500">
+                            <p className="text-xs mt-2 text-muted-foreground">
                               Responded on{" "}
                               {new Date(
                                 selectedMatch.match.responseDate
@@ -634,17 +634,17 @@ export default function DoctorTrialMatching() {
 
                     {/* Trial Description */}
                     <div>
-                      <h4 className="font-medium text-[#1D1D1F] mb-2">
+                      <h4 className="font-medium text-foreground mb-2">
                         Study Description
                       </h4>
-                      <p className="text-sm text-[#86868B] leading-relaxed">
+                      <p className="text-sm text-muted-foreground leading-relaxed">
                         {selectedMatch.trial.description}
                       </p>
                     </div>
 
                     {/* Eligibility Criteria */}
                     <div>
-                      <h4 className="font-medium text-[#1D1D1F] mb-2">
+                      <h4 className="font-medium text-foreground mb-2">
                         Eligibility Criteria
                       </h4>
                       <ul className="space-y-1">
@@ -652,9 +652,9 @@ export default function DoctorTrialMatching() {
                           (criteria, index) => (
                             <li
                               key={index}
-                              className="text-sm text-[#86868B] flex items-start"
+                              className="text-sm text-muted-foreground flex items-start"
                             >
-                              <span className="text-[#0066CC] mr-2">•</span>
+                              <span className="text-primary mr-2">•</span>
                               {criteria}
                             </li>
                           )
@@ -664,7 +664,7 @@ export default function DoctorTrialMatching() {
 
                     {/* Matching Factors */}
                     <div>
-                      <h4 className="font-medium text-[#1D1D1F] mb-2">
+                      <h4 className="font-medium text-foreground mb-2">
                         Why This Match?
                       </h4>
                       <div className="space-y-2">
@@ -677,7 +677,7 @@ export default function DoctorTrialMatching() {
                                 className="flex items-center space-x-2"
                               >
                                 <CheckCircle className="h-4 w-4 text-green-600" />
-                                <span className="text-sm text-[#86868B]">
+                                <span className="text-sm text-muted-foreground">
                                   {factor}
                                 </span>
                               </div>
@@ -687,7 +687,7 @@ export default function DoctorTrialMatching() {
 
                     {/* Doctor Notes */}
                     <div>
-                      <h4 className="font-medium text-[#1D1D1F] mb-2">
+                      <h4 className="font-medium text-foreground mb-2">
                         Doctor Notes
                       </h4>
                       <Textarea
@@ -707,7 +707,7 @@ export default function DoctorTrialMatching() {
                             onClick={() =>
                               handleSendNotification(selectedMatch.match._id)
                             }
-                            className="flex-1 bg-blue-600 hover:bg-blue-700"
+                            className="flex-1 bg-primary hover:bg-primary/90"
                             disabled={isSubmitting}
                           >
                             {isSubmitting ? (
@@ -723,7 +723,7 @@ export default function DoctorTrialMatching() {
                               onClick={() =>
                                 handleApprove(selectedMatch.match._id)
                               }
-                              className="flex-1 bg-[#0066CC] hover:bg-[#0077ED]"
+                              className="flex-1 bg-primary hover:bg-primary/90"
                               disabled={isSubmitting}
                             >
                               {isSubmitting ? (
@@ -774,14 +774,14 @@ export default function DoctorTrialMatching() {
                   </CardContent>
                 </Card>
               ) : (
-                <Card className="bg-white">
+                <Card className="bg-card">
                   <CardContent className="flex items-center justify-center py-12">
                     <div className="text-center">
-                      <Search className="h-12 w-12 text-[#86868B] mx-auto mb-4" />
-                      <h3 className="text-lg font-medium text-[#1D1D1F] mb-2">
+                      <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-lg font-medium text-foreground mb-2">
                         Select a Trial Match
                       </h3>
-                      <p className="text-[#86868B]">
+                      <p className="text-muted-foreground">
                         Choose a trial match from the list to view details and
                         take action
                       </p>
