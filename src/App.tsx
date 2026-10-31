@@ -19,6 +19,7 @@ import DoctorRoute from "./components/wrappers/DoctorRoute";
 import PatientRoute from "./components/wrappers/PatientRoute";
 import ProtectedRoute from "./components/wrappers/ProtectedRoute";
 import { initializeAgentSystem } from "./agents";
+import { Toaster } from "@/components/ui/toaster";
 
 function App() {
   // Get the Convex client
@@ -165,7 +166,7 @@ function App() {
             }
           />
         </Routes>
-
+        <Toaster />
       </>
     </Suspense>
   );

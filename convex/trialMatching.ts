@@ -1,5 +1,7 @@
 import { v } from "convex/values";
-import { action, internalMutation, mutation, query } from "./_generated/server";
+import { action, internalMutation, mutation, query, internalQuery, internalAction } from "./_generated/server";
+import { conditionsMatch } from "./conditionMatching";
+import { canAccessConsultation, canAccessMatch, canAccessPatient, isDoctor, isSignedIn, requireDoctorAction, requireMatchAccess } from "./authz";
 import { api, internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
 import { ConvexError } from "convex/values";
@@ -19,13 +21,14 @@ const WEIGHTS = {
  * Find matching trials for a patient based on consultation data
  * This is the main function that orchestrates the matching process
  */
-export const findMatchingTrials = action({
+// Server-side implementation; runs without a user (e.g. from the scheduler).
+export const findMatchingTrialsInternal = internalAction({
   args: {
     consultationId: v.id("consultations"),
   },
   handler: async (ctx, args) => {
     // Get consultation data
-    const consultation = await ctx.runQuery(api.consultations.get, {
+    const consultation = await ctx.runQuery(internal.consultations.getInternal, {
       id: args.consultationId,
     });
 
@@ -40,7 +43,7 @@ export const findMatchingTrials = action({
     }
 
     // Get patient data (to access age, gender, etc.)
-    const patient = await ctx.runQuery(api.users.getById, {
+    const patient = await ctx.runQuery(internal.users.getByIdInternal, {
       id: consultation.patientId,
     });
 
@@ -50,7 +53,7 @@ export const findMatchingTrials = action({
 
     // Get all active/recruiting clinical trials
     const allTrials = await ctx.runQuery(
-      api.trialMatching.listActiveTrials,
+      internal.trialMatching.listActiveTrialsInternal,
       {}
     );
 
@@ -66,10 +69,14 @@ export const findMatchingTrials = action({
       allTrials
     );
 
-    // Filter trials with a minimum relevance score (e.g., 50%)
+    // Filter trials with a minimum relevance score (e.g., 50%).
+    // A trial must also match at least one of the patient's conditions;
+    // otherwise age/gender/medication points alone can clear the threshold.
     const MIN_RELEVANCE_SCORE = 50;
     const matchedTrials = scoredTrials.filter(
-      (trial) => trial.relevanceScore >= MIN_RELEVANCE_SCORE
+      (trial) =>
+        trial.scoreComponents.conditionMatch.score > 0 &&
+        trial.relevanceScore >= MIN_RELEVANCE_SCORE
     );
 
     // Sort trials by relevance score (highest first)
@@ -92,6 +99,16 @@ export const findMatchingTrials = action({
       matchedTrials,
       matchCount: matchedTrials.length,
     };
+  },
+});
+
+export const findMatchingTrials = action({
+  args: {
+    consultationId: v.id("consultations"),
+  },
+  handler: async (ctx, args): Promise<any> => {
+    await requireDoctorAction(ctx);
+    return await ctx.runAction(internal.trialMatching.findMatchingTrialsInternal, args);
   },
 });
 
@@ -162,18 +179,9 @@ function scoreConditionMatch(
   patientConditions: { name: string; severity: string }[],
   trial: Doc<"clinicalTrials">
 ) {
-  // Check if any of the patient's conditions match the trial's target conditions
-  const patientConditionNames = patientConditions.map((c) =>
-    c.name.toLowerCase()
-  );
-
-  // For each target condition, check if the patient has it
+  // For each target condition, check if the patient has it (synonym-aware)
   const matchedConditions = trial.targetConditions.filter((condition) =>
-    patientConditionNames.some(
-      (patientCondition) =>
-        patientCondition.includes(condition.toLowerCase()) ||
-        condition.toLowerCase().includes(patientCondition)
-    )
+    patientConditions.some((c) => conditionsMatch(c.name, condition))
   );
 
   if (matchedConditions.length === 0) {
@@ -452,14 +460,14 @@ async function storeTrialMatches(
 ) {
   // First, check for existing matches to avoid duplicates
   const existingMatches = await ctx.runQuery(
-    api.trialMatching.listMatchesForConsultation,
+    internal.trialMatching.listMatchesForConsultationInternal,
     {
       consultationId: consultation._id,
     }
   );
 
   const existingTrialIds = new Set(
-    existingMatches.map((match) => match.trialId.toString())
+    existingMatches.map((match: any) => match.trialId.toString())
   );
 
   // Store each match in the database
@@ -550,14 +558,25 @@ export const createTrialMatch = internalMutation({
 /**
  * Function to trigger matching after medical entity extraction
  */
+// Server-side implementation; runs without a user (e.g. from the scheduler).
+export const runMatchingAfterExtractionInternal = internalAction({
+  args: {
+    consultationId: v.id("consultations"),
+  },
+  handler: async (ctx, args): Promise<any> => {
+    return await ctx.runAction(internal.trialMatching.findMatchingTrialsInternal, {
+      consultationId: args.consultationId,
+    });
+  },
+});
+
 export const runMatchingAfterExtraction = action({
   args: {
     consultationId: v.id("consultations"),
   },
-  handler: async (ctx, args) => {
-    return await ctx.runAction(api.trialMatching.findMatchingTrials, {
-      consultationId: args.consultationId,
-    });
+  handler: async (ctx, args): Promise<any> => {
+    await requireDoctorAction(ctx);
+    return await ctx.runAction(internal.trialMatching.runMatchingAfterExtractionInternal, args);
   },
 });
 
@@ -565,6 +584,28 @@ export const runMatchingAfterExtraction = action({
  * Query to list active/recruiting trials
  */
 export const listActiveTrials = query({
+  args: {},
+  handler: async (ctx) => {
+    if (!(await isSignedIn(ctx))) return [];
+    // Query recruiting trials
+    const recruitingTrials = await ctx.db
+      .query("clinicalTrials")
+      .withIndex("by_status", (q) => q.eq("status", "recruiting"))
+      .collect();
+
+    // Query active trials
+    const activeTrials = await ctx.db
+      .query("clinicalTrials")
+      .withIndex("by_status", (q) => q.eq("status", "active"))
+      .collect();
+
+    // Combine and return both sets of trials
+    return [...recruitingTrials, ...activeTrials];
+  },
+});
+
+// Same as `listActiveTrials`, without access checks, for server-side callers.
+export const listActiveTrialsInternal = internalQuery({
   args: {},
   handler: async (ctx) => {
     // Query recruiting trials
@@ -592,6 +633,22 @@ export const listMatchesForConsultation = query({
     consultationId: v.id("consultations"),
   },
   handler: async (ctx, args) => {
+    if (!(await canAccessConsultation(ctx, args.consultationId))) return [];
+    return await ctx.db
+      .query("trialMatches")
+      .withIndex("by_consultation", (q) =>
+        q.eq("consultationId", args.consultationId)
+      )
+      .collect();
+  },
+});
+
+// Same as `listMatchesForConsultation`, without access checks, for server-side callers.
+export const listMatchesForConsultationInternal = internalQuery({
+  args: {
+    consultationId: v.id("consultations"),
+  },
+  handler: async (ctx, args) => {
     return await ctx.db
       .query("trialMatches")
       .withIndex("by_consultation", (q) =>
@@ -609,10 +666,40 @@ export const listMatchesForPatient = query({
     patientId: v.id("users"),
   },
   handler: async (ctx, args) => {
+    if (!(await canAccessPatient(ctx, args.patientId))) return [];
     return await ctx.db
       .query("trialMatches")
       .withIndex("by_patient", (q) => q.eq("patientId", args.patientId))
       .collect();
+  },
+});
+
+/**
+ * Query for doctors: matches that haven't been reviewed and sent to the patient yet
+ */
+export const listMatchesAwaitingReview = query({
+  args: {},
+  handler: async (ctx) => {
+    if (!(await isDoctor(ctx))) return [];
+    return await ctx.db
+      .query("trialMatches")
+      .withIndex("by_notification_status", (q) =>
+        q.eq("notificationStatus", "pending")
+      )
+      .collect();
+  },
+});
+
+/**
+ * Query to get a single trial match by ID
+ */
+export const getMatchById = query({
+  args: {
+    id: v.id("trialMatches"),
+  },
+  handler: async (ctx, args) => {
+    if (!(await canAccessMatch(ctx, args.id))) return null;
+    return await ctx.db.get(args.id);
   },
 });
 
@@ -624,6 +711,9 @@ export const getTrialDetailsForMatches = query({
     matchIds: v.array(v.id("trialMatches")),
   },
   handler: async (ctx, args) => {
+    for (const matchId of args.matchIds) {
+      if (!(await canAccessMatch(ctx, matchId))) return [];
+    }
     const matches = await Promise.all(
       args.matchIds.map(async (id) => {
         const match = await ctx.db.get(id);
@@ -667,6 +757,7 @@ export const updateMatchStatus = mutation({
     doctorNotes: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    await requireMatchAccess(ctx, args.matchId);
     const match = await ctx.db.get(args.matchId);
     if (!match) {
       throw new ConvexError("Trial match not found");

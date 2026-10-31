@@ -34,6 +34,7 @@ export default function RoleSelection() {
   const [age, setAge] = useState("");
   const [location, setLocation] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const updateUserRole = useMutation(api.users.updateUserRole);
   const navigate = useNavigate();
@@ -42,6 +43,7 @@ export default function RoleSelection() {
     if (!selectedRole) return;
 
     setIsLoading(true);
+    setError(null);
     try {
       const updateData: any = { role: selectedRole };
 
@@ -64,6 +66,12 @@ export default function RoleSelection() {
       }
     } catch (error) {
       console.error("Error updating role:", error);
+      const message = error instanceof Error ? error.message : String(error);
+      setError(
+        message.includes("Not authenticated")
+          ? "You're not signed in. Sign in, then choose your role again."
+          : "Your role couldn't be saved. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -281,6 +289,11 @@ export default function RoleSelection() {
                 </>
               )}
             </Button>
+            {error && (
+              <p role="alert" className="mt-4 text-sm font-bold text-destructive">
+                {error}
+              </p>
+            )}
           </div>
         </div>
       </main>

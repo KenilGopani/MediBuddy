@@ -1,5 +1,6 @@
 import { v } from "convex/values";
-import { action, internalMutation } from "./_generated/server";
+import { action, internalMutation, internalAction } from "./_generated/server";
+import { requireConsultationAccessAction, requireDoctorAction } from "./authz";
 import { api, internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import { ConvexError } from "convex/values";
@@ -110,7 +111,8 @@ async function retryWithExponentialBackoff<T>(
  * This action takes the basic medical entities extracted by OpenAI/Gemini
  * and enhances them with ASI1's agentic reasoning capabilities
  */
-export const enhanceMedicalAnalysis = action({
+// Server-side implementation; runs without a user (e.g. from the scheduler).
+export const enhanceMedicalAnalysisInternal = internalAction({
   args: {
     consultationId: v.id("consultations"),
     extractedEntities: v.object({
@@ -137,7 +139,7 @@ export const enhanceMedicalAnalysis = action({
   handler: async (ctx, args) => {
     try {
       // Get consultation and patient data
-      const consultation = await ctx.runQuery(api.consultations.get, {
+      const consultation = await ctx.runQuery(internal.consultations.getInternal, {
         id: args.consultationId,
       });
 
@@ -145,7 +147,7 @@ export const enhanceMedicalAnalysis = action({
         throw new ConvexError("Consultation not found");
       }
 
-      const patient = await ctx.runQuery(api.users.getById, {
+      const patient = await ctx.runQuery(internal.users.getByIdInternal, {
         id: consultation.patientId,
       });
 
@@ -353,11 +355,42 @@ Format your response as JSON with the following structure:
   },
 });
 
+export const enhanceMedicalAnalysis = action({
+  args: {
+    consultationId: v.id("consultations"),
+    extractedEntities: v.object({
+      conditions: v.array(
+        v.object({
+          name: v.string(),
+          severity: v.optional(
+            v.union(
+              v.literal("mild"),
+              v.literal("moderate"),
+              v.literal("severe")
+            )
+          ),
+        })
+      ),
+      medications: v.array(v.string()),
+      allergies: v.array(v.string()),
+      symptoms: v.optional(v.array(v.string())),
+      labResults: v.optional(v.record(v.string(), v.any())),
+      comorbidities: v.optional(v.array(v.string())),
+      vitals: v.optional(v.record(v.string(), v.any())),
+    }),
+  },
+  handler: async (ctx, args): Promise<any> => {
+    await requireDoctorAction(ctx);
+    return await ctx.runAction(internal.asi1.enhanceMedicalAnalysisInternal, args);
+  },
+});
+
 /**
  * ASI1-powered Clinical Trial Reasoning
  * This action uses ASI1 to perform intelligent analysis of clinical trial matches
  */
-export const analyzeTrialMatches = action({
+// Server-side implementation; runs without a user (e.g. from the scheduler).
+export const analyzeTrialMatchesInternal = internalAction({
   args: {
     consultationId: v.id("consultations"),
     trialMatches: v.array(v.any()),
@@ -487,6 +520,18 @@ Format as JSON with enhanced trial recommendations.`,
   },
 });
 
+export const analyzeTrialMatches = action({
+  args: {
+    consultationId: v.id("consultations"),
+    trialMatches: v.array(v.any()),
+    medicalContext: v.any(),
+  },
+  handler: async (ctx, args): Promise<any> => {
+    await requireDoctorAction(ctx);
+    return await ctx.runAction(internal.asi1.analyzeTrialMatchesInternal, args);
+  },
+});
+
 /**
  * Internal mutation to store ASI1 interactions for tracking and analysis
  */
@@ -524,8 +569,9 @@ export const getInteractionsForConsultation = action({
   args: {
     consultationId: v.id("consultations"),
   },
-  handler: async (ctx, args) => {
-    return await ctx.runQuery(internal.asi1.queryInteractions, {
+  handler: async (ctx, args): Promise<any> => {
+    await requireConsultationAccessAction(ctx, args.consultationId);
+    return await ctx.runMutation(internal.asi1.queryInteractions, {
       consultationId: args.consultationId,
     });
   },

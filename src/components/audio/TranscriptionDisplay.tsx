@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Id } from "../../../convex/_generated/dataModel";
 import { Badge } from "@/components/ui/badge";
@@ -95,8 +95,8 @@ const TranscriptionDisplay = ({
     id: consultationId,
   });
 
-  // Mutation to re-process transcription
-  const reprocessTranscription = useMutation(
+  // Action to re-process transcription
+  const reprocessTranscription = useAction(
     api.medicalEntityExtraction.reprocessTranscription
   );
 

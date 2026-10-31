@@ -92,7 +92,7 @@ const FEATURES = [
     icon: SearchCheck,
     title: "Finds trials that fit",
     description:
-      "Matches are ranked against live ClinicalTrials.gov listings by condition, age, medication and location.",
+      "Matches are ranked against live ClinicalTrials.gov listings by condition, age, gender and medication.",
   },
   {
     icon: ShieldCheck,
@@ -148,7 +148,7 @@ function VisitDemo() {
               Type 2 diabetes with stable angina
             </p>
             <p className="mt-1 text-sm text-primary-foreground/80">
-              Phase 3 · Adults 40–75 · 12 km away
+              Phase 3 · Adults 40–75
             </p>
           </div>
           <div className="shrink-0 rounded-lg bg-marker px-3 py-1.5 text-center text-foreground">

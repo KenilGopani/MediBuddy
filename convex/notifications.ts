@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query, action } from "./_generated/server";
+import { canAccessMatch, canAccessPatient, currentUser, requireDoctor, requireMatchAccess } from "./authz";
 import { api, internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
 import { ConvexError } from "convex/values";
@@ -12,6 +13,7 @@ export const getPatientNotifications = query({
     patientId: v.id("users"),
   },
   handler: async (ctx, args) => {
+    if (!(await canAccessPatient(ctx, args.patientId))) return [];
     // Get all trial matches for the patient
     const trialMatches = await ctx.db
       .query("trialMatches")
@@ -70,6 +72,7 @@ export const getUnreadNotificationCount = query({
     patientId: v.id("users"),
   },
   handler: async (ctx, args) => {
+    if (!(await canAccessPatient(ctx, args.patientId))) return 0;
     const unreadNotifications = await ctx.db
       .query("trialMatches")
       .withIndex("by_patient", (q) => q.eq("patientId", args.patientId))
@@ -88,6 +91,7 @@ export const getActionRequiredNotificationCount = query({
     patientId: v.id("users"),
   },
   handler: async (ctx, args) => {
+    if (!(await canAccessPatient(ctx, args.patientId))) return 0;
     const actionRequiredNotifications = await ctx.db
       .query("trialMatches")
       .withIndex("by_patient", (q) => q.eq("patientId", args.patientId))
@@ -107,6 +111,7 @@ export const sendTrialNotifications = mutation({
     doctorNotes: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    await requireDoctor(ctx);
     const results = await Promise.all(
       args.matchIds.map(async (matchId) => {
         const match = await ctx.db.get(matchId);
@@ -147,6 +152,7 @@ export const markNotificationViewed = mutation({
     notificationId: v.id("trialMatches"),
   },
   handler: async (ctx, args) => {
+    await requireMatchAccess(ctx, args.notificationId);
     const notification = await ctx.db.get(args.notificationId);
 
     if (!notification) {
@@ -180,6 +186,7 @@ export const updatePatientConsent = mutation({
     patientResponse: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    await requireMatchAccess(ctx, args.matchId);
     const match = await ctx.db.get(args.matchId);
 
     if (!match) {
@@ -228,6 +235,8 @@ export const getTrialsByConsentStatus = query({
     ),
   },
   handler: async (ctx, args) => {
+    const viewer = await currentUser(ctx);
+    if (!viewer) return [];
     // Query trials with the specified consent status
     let matches: Doc<"trialMatches">[];
 
@@ -239,6 +248,11 @@ export const getTrialsByConsentStatus = query({
         .collect();
     } else {
       matches = await ctx.db.query("trialMatches").collect();
+    }
+
+    // Patients only see their own matches; doctors see all
+    if (viewer.role !== "doctor") {
+      matches = matches.filter((m) => m.patientId === viewer._id);
     }
 
     // For each match, get the trial and patient details
@@ -282,6 +296,7 @@ export const getConsentHistory = query({
     matchId: v.id("trialMatches"),
   },
   handler: async (ctx, args) => {
+    if (!(await canAccessMatch(ctx, args.matchId))) return null;
     const match = await ctx.db.get(args.matchId);
 
     if (!match) {

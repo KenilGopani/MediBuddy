@@ -46,7 +46,7 @@ export default function PatientRoute({ children }: PatientRouteProps) {
     return <LoadingSpinner />;
   }
 
-  if (userData === null) {
+  if (userData === null || !userData.roleConfirmed) {
     return <Navigate to="/role-selection" replace />;
   }
 

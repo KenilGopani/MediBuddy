@@ -75,10 +75,10 @@ export default function DoctorDashboard() {
     userData?._id ? { doctorId: userData._id } : "skip"
   );
 
-  // Fetch trial matches for this doctor's patients
+  // Fetch trial matches awaiting the doctor's review
   const trialMatches = useQuery(
-    api.notifications.getPatientNotifications,
-    userData?._id ? { patientId: userData._id } : "skip"
+    api.trialMatching.listMatchesAwaitingReview,
+    userData?._id ? {} : "skip"
   );
 
   // State for scheduling dialog
@@ -125,6 +125,12 @@ export default function DoctorDashboard() {
 
   // Get real trial matches data
   const pendingTrialMatches = trialMatches?.slice(0, 5) || [];
+
+  // Most recent completed visits, to open their recording, transcript and report
+  const recentConsultations = [...(consultations ?? [])]
+    .filter((c) => c.status === "completed")
+    .sort((a, b) => b.startTime - a.startTime)
+    .slice(0, 8);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -636,6 +642,66 @@ export default function DoctorDashboard() {
               </Card>
             </Link>
           </div>
+
+          {/* Recent Consultations */}
+          <Card className="bg-card mt-8">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <FileText className="h-5 w-5 text-primary" />
+                <span>Recent Consultations</span>
+              </CardTitle>
+              <CardDescription>
+                Open a visit to listen to the recording and read the transcript
+                and report
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {recentConsultations.length > 0 ? (
+                <ul className="divide-y divide-border">
+                  {recentConsultations.map((c) => {
+                    const patient = allPatients?.find(
+                      (p) => p._id === c.patientId
+                    );
+                    return (
+                      <li key={c._id}>
+                        <Link
+                          to={`/doctor/consultation/${c._id}?patientId=${c.patientId}`}
+                          className="-mx-2 flex items-center justify-between gap-4 rounded-lg px-2 py-3 transition-colors hover:bg-muted"
+                        >
+                          <div className="min-w-0">
+                            <div className="font-bold truncate">
+                              {patient?.name || "Patient"}
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                              {format(new Date(c.startTime), "PPP")}
+                            </div>
+                          </div>
+                          <div className="flex shrink-0 flex-wrap justify-end gap-2">
+                            {c.audioRecordingId && (
+                              <Badge variant="outline" className="gap-1">
+                                <Mic className="h-3 w-3" />
+                                Recording
+                              </Badge>
+                            )}
+                            {c.medicalReport && (
+                              <Badge variant="outline">Report</Badge>
+                            )}
+                            {c.sharedWithPatient && (
+                              <Badge variant="outline">Shared</Badge>
+                            )}
+                          </div>
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <div className="text-center py-6 text-muted-foreground">
+                  No consultations yet.
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </main>
       <Footer />

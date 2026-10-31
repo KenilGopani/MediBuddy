@@ -1,5 +1,6 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { mutation, query, internalQuery } from "./_generated/server";
+import { canViewUser, isDoctor, requirePatientAccess } from "./authz";
 
 export const getUserByToken = query({
   args: { tokenIdentifier: v.string() },
@@ -26,6 +27,15 @@ export const getUserByToken = query({
 });
 
 export const getById = query({
+  args: { id: v.id("users") },
+  handler: async (ctx, args) => {
+    if (!(await canViewUser(ctx, args.id))) return null;
+    return await ctx.db.get(args.id);
+  },
+});
+
+// Same as `getById`, without access checks, for server-side callers.
+export const getByIdInternal = internalQuery({
   args: { id: v.id("users") },
   handler: async (ctx, args) => {
     return await ctx.db.get(args.id);
@@ -101,7 +111,7 @@ export const updateUserRole = mutation({
       throw new Error("User not found");
     }
 
-    const updateData: any = { role: args.role };
+    const updateData: any = { role: args.role, roleConfirmed: true };
 
     if (args.role === "doctor") {
       if (args.specialization) updateData.specialization = args.specialization;
@@ -122,6 +132,7 @@ export const updateUserRole = mutation({
 export const getAllPatients = query({
   args: {},
   handler: async (ctx, args) => {
+    if (!(await isDoctor(ctx))) return [];
     return await ctx.db
       .query("users")
       .withIndex("by_role", (q) => q.eq("role", "patient"))
@@ -133,6 +144,9 @@ export const getAllPatients = query({
 export const getUsersByIds = query({
   args: { ids: v.array(v.id("users")) },
   handler: async (ctx, args) => {
+    for (const id of args.ids) {
+      if (!(await canViewUser(ctx, id))) return [];
+    }
     const users = await Promise.all(args.ids.map((id) => ctx.db.get(id)));
     return users.filter(Boolean); // Remove any null results
   },
@@ -158,6 +172,7 @@ export const updateBasicMedicalInfo = mutation({
     allergies: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
+    await requirePatientAccess(ctx, args.patientId);
     const user = await ctx.db.get(args.patientId);
     if (!user || user.role !== "patient") {
       throw new Error("Patient not found");

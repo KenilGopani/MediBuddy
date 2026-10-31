@@ -1,9 +1,21 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { mutation, query, internalQuery } from "./_generated/server";
+import { canAccessConsultation, canAccessMeeting, canAccessPatient, isDoctor, isSelfDoctor, requireDoctor } from "./authz";
 import { Id } from "./_generated/dataModel";
 
 // Get a consultation by ID
 export const get = query({
+  args: {
+    id: v.id("consultations"),
+  },
+  handler: async (ctx, args) => {
+    if (!(await canAccessConsultation(ctx, args.id))) return null;
+    return await ctx.db.get(args.id);
+  },
+});
+
+// Same as `get`, without access checks, for server-side callers.
+export const getInternal = internalQuery({
   args: {
     id: v.id("consultations"),
   },
@@ -19,6 +31,7 @@ export const create = mutation({
     patientId: v.id("users"),
   },
   handler: async (ctx, args) => {
+    await requireDoctor(ctx);
     const consultationId = await ctx.db.insert("consultations", {
       doctorId: args.doctorId,
       patientId: args.patientId,
@@ -37,6 +50,7 @@ export const updateTranscription = mutation({
     transcription: v.string(),
   },
   handler: async (ctx, args) => {
+    await requireDoctor(ctx);
     const consultation = await ctx.db.get(args.id);
     if (!consultation) {
       throw new Error("Consultation not found");
@@ -57,6 +71,7 @@ export const complete = mutation({
     id: v.id("consultations"),
   },
   handler: async (ctx, args) => {
+    await requireDoctor(ctx);
     const consultation = await ctx.db.get(args.id);
     if (!consultation) {
       throw new Error("Consultation not found");
@@ -96,6 +111,7 @@ export const updateStructuredData = mutation({
     }),
   },
   handler: async (ctx, args) => {
+    await requireDoctor(ctx);
     const consultation = await ctx.db.get(args.id);
     if (!consultation) {
       throw new Error("Consultation not found");
@@ -122,6 +138,7 @@ export const listForDoctor = query({
     doctorId: v.id("users"),
   },
   handler: async (ctx, args) => {
+    if (!(await isSelfDoctor(ctx, args.doctorId))) return [];
     return await ctx.db
       .query("consultations")
       .withIndex("by_doctor", (q) => q.eq("doctorId", args.doctorId))
@@ -135,6 +152,7 @@ export const listConsultationsForPatient = query({
     patientId: v.id("users"),
   },
   handler: async (ctx, args) => {
+    if (!(await canAccessPatient(ctx, args.patientId))) return [];
     return await ctx.db
       .query("consultations")
       .withIndex("by_patient", (q) => q.eq("patientId", args.patientId))
@@ -149,6 +167,7 @@ export const shareWithPatient = mutation({
     doctorId: v.id("users"),
   },
   handler: async (ctx, args) => {
+    await requireDoctor(ctx);
     const consultation = await ctx.db.get(args.id);
     if (!consultation) {
       throw new Error("Consultation not found");
@@ -182,6 +201,7 @@ export const listSharedConsultationsForPatient = query({
     patientId: v.id("users"),
   },
   handler: async (ctx, args) => {
+    if (!(await canAccessPatient(ctx, args.patientId))) return [];
     return await ctx.db
       .query("consultations")
       .withIndex("by_patient", (q) => q.eq("patientId", args.patientId))
@@ -198,6 +218,7 @@ export const findExistingConsultation = query({
     startTimeAfter: v.optional(v.number()), // Optional: find consultations after a specific time
   },
   handler: async (ctx, args) => {
+    if (!(await isDoctor(ctx))) return null;
     // Get all consultations for this doctor-patient pair
     let consultationsQuery = ctx.db
       .query("consultations")
@@ -228,6 +249,7 @@ export const getConsultationByMeeting = query({
     meetingId: v.id("meetings"),
   },
   handler: async (ctx, args) => {
+    if (!(await canAccessMeeting(ctx, args.meetingId))) return null;
     const consultation = await ctx.db
       .query("consultations")
       .withIndex("by_meeting", (q) => q.eq("meetingId", args.meetingId))
@@ -245,6 +267,7 @@ export const createOrGetConsultation = mutation({
     meetingId: v.optional(v.id("meetings")),
   },
   handler: async (ctx, args) => {
+    await requireDoctor(ctx);
     // First, if we have a meetingId, check if there's already a consultation for this meeting
     if (args.meetingId) {
       const existingByMeeting = await ctx.db
@@ -300,6 +323,7 @@ export const cleanupDuplicateConsultations = mutation({
     keepConsultationId: v.id("consultations"), // The consultation to keep
   },
   handler: async (ctx, args) => {
+    await requireDoctor(ctx);
     // Find all active consultations for this doctor-patient pair
     const duplicateConsultations = await ctx.db
       .query("consultations")
@@ -335,6 +359,7 @@ export const cleanupDuplicateConsultations = mutation({
 export const findDuplicateConsultations = query({
   args: {},
   handler: async (ctx, args) => {
+    if (!(await isDoctor(ctx))) return [];
     // Get all active consultations
     const activeConsultations = await ctx.db
       .query("consultations")
@@ -342,14 +367,14 @@ export const findDuplicateConsultations = query({
       .collect();
 
     // Group by doctor-patient pair
-    const groupedConsultations = new Map();
+    const groupedConsultations = new Map<string, any[]>();
 
     for (const consultation of activeConsultations) {
       const key = `${consultation.doctorId}-${consultation.patientId}`;
       if (!groupedConsultations.has(key)) {
         groupedConsultations.set(key, []);
       }
-      groupedConsultations.get(key).push(consultation);
+      groupedConsultations.get(key)!.push(consultation);
     }
 
     // Find groups with more than one consultation (duplicates)

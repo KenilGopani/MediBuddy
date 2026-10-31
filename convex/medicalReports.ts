@@ -1,16 +1,19 @@
 import { v } from "convex/values";
 import { action, mutation, query } from "./_generated/server";
-import { api } from "./_generated/api";
+import { canAccessConsultation, requireDoctor, requireDoctorAction } from "./authz";
+import { api, internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
+import { chatCompletion } from "./llm";
 
-// Action to generate medical report using Google Gemini
+// Action to generate medical report using the configured LLM
 export const generateMedicalReport = action({
   args: {
     consultationId: v.id("consultations"),
   },
   handler: async (ctx, args) => {
+    await requireDoctorAction(ctx);
     // Get the consultation data
-    const consultation = await ctx.runQuery(api.consultations.get, {
+    const consultation = await ctx.runQuery(internal.consultations.getInternal, {
       id: args.consultationId,
     });
 
@@ -23,12 +26,6 @@ export const generateMedicalReport = action({
     }
 
     try {
-      // Get the Google Gemini API key from environment variables
-      const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
-      if (!apiKey) {
-        throw new Error("Google Gemini API key not found");
-      }
-
       // Prepare the prompt for SOAP format medical report
       const prompt = `
 You are a medical professional creating a SOAP format medical report. Based on the consultation transcription below, generate ONLY the following sections with actual medical content:
@@ -65,46 +62,14 @@ ${consultation.transcription}
 ${consultation.structuredData ? JSON.stringify(consultation.structuredData, null, 2) : "No additional structured data"}
 `;
 
-      // Call Google Gemini API
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            contents: [
-              {
-                parts: [
-                  {
-                    text: prompt,
-                  },
-                ],
-              },
-            ],
-            generationConfig: {
-              temperature: 0.3,
-              topK: 40,
-              topP: 0.95,
-              maxOutputTokens: 2048,
-            },
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(
-          `Google Gemini API error: ${response.status} ${errorText}`
-        );
-      }
-
-      const result = await response.json();
-      const generatedReport = result.candidates?.[0]?.content?.parts?.[0]?.text;
+      const generatedReport = await chatCompletion({
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.3,
+        maxTokens: 4000,
+      });
 
       if (!generatedReport) {
-        throw new Error("No report generated from Gemini API");
+        throw new Error("No report generated from the AI model");
       }
 
       // Store the medical report
@@ -132,6 +97,7 @@ export const storeMedicalReport = mutation({
     generatedAt: v.number(),
   },
   handler: async (ctx, args) => {
+    await requireDoctor(ctx);
     // Update the consultation with the medical report
     await ctx.db.patch(args.consultationId, {
       medicalReport: args.reportContent,
@@ -149,6 +115,7 @@ export const getMedicalReport = query({
     consultationId: v.id("consultations"),
   },
   handler: async (ctx, args) => {
+    if (!(await canAccessConsultation(ctx, args.consultationId))) return null;
     const consultation = await ctx.db.get(args.consultationId);
     if (!consultation) {
       return null;

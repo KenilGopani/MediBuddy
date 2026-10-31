@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { canAccessMeeting, canAccessPatient, isSelfDoctor, requireMeetingAccess, requireMeetingParticipant } from "./authz";
 
 // Create a new meeting
 export const createMeeting = mutation({
@@ -24,6 +25,7 @@ export const createMeeting = mutation({
     meetingLink: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    await requireMeetingParticipant(ctx, args.doctorId, args.patientId);
     const now = Date.now();
 
     const meetingId = await ctx.db.insert("meetings", {
@@ -51,6 +53,7 @@ export const getMeetingById = query({
     id: v.id("meetings"),
   },
   handler: async (ctx, args) => {
+    if (!(await canAccessMeeting(ctx, args.id))) return null;
     return await ctx.db.get(args.id);
   },
 });
@@ -61,6 +64,7 @@ export const getMeetingsForDoctor = query({
     doctorId: v.id("users"),
   },
   handler: async (ctx, args) => {
+    if (!(await isSelfDoctor(ctx, args.doctorId))) return [];
     return await ctx.db
       .query("meetings")
       .withIndex("by_doctor", (q) => q.eq("doctorId", args.doctorId))
@@ -75,6 +79,7 @@ export const getMeetingsForPatient = query({
     patientId: v.id("users"),
   },
   handler: async (ctx, args) => {
+    if (!(await canAccessPatient(ctx, args.patientId))) return [];
     return await ctx.db
       .query("meetings")
       .withIndex("by_patient", (q) => q.eq("patientId", args.patientId))
@@ -89,6 +94,7 @@ export const getUpcomingMeetingsForDoctor = query({
     doctorId: v.id("users"),
   },
   handler: async (ctx, args) => {
+    if (!(await isSelfDoctor(ctx, args.doctorId))) return [];
     const now = Date.now();
 
     return await ctx.db
@@ -111,6 +117,7 @@ export const getUpcomingMeetingsForPatient = query({
     patientId: v.id("users"),
   },
   handler: async (ctx, args) => {
+    if (!(await canAccessPatient(ctx, args.patientId))) return [];
     const now = Date.now();
 
     return await ctx.db
@@ -140,6 +147,7 @@ export const updateMeetingStatus = mutation({
     notes: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    await requireMeetingAccess(ctx, args.meetingId);
     const now = Date.now();
 
     await ctx.db.patch(args.meetingId, {
@@ -158,6 +166,7 @@ export const deleteMeeting = mutation({
     meetingId: v.id("meetings"),
   },
   handler: async (ctx, args) => {
+    await requireMeetingAccess(ctx, args.meetingId);
     await ctx.db.delete(args.meetingId);
     return { success: true };
   },

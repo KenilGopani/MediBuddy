@@ -193,6 +193,14 @@ export default function PatientReports() {
                               Report Available
                             </Badge>
                           )}
+                          {consultation.audioRecordingId && (
+                            <Badge
+                              variant="outline"
+                              className="bg-primary/5 text-primary border-primary/25"
+                            >
+                              Recording
+                            </Badge>
+                          )}
                         </div>
                       </div>
                     </CardHeader>

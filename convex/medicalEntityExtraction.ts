@@ -1,9 +1,10 @@
 import { v } from "convex/values";
-import { action, internalMutation } from "./_generated/server";
+import { action, internalMutation, internalAction } from "./_generated/server";
+import { requireDoctorAction } from "./authz";
 import { api, internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import { ConvexError } from "convex/values";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { chatCompletion, parseJsonObject } from "./llm";
 
 // Maximum number of retries for API calls
 const MAX_RETRIES = 3;
@@ -47,13 +48,14 @@ async function retryWithExponentialBackoff<T>(
 }
 
 // Action to extract medical entities from transcription
-export const extractMedicalEntities = action({
+// Server-side implementation; runs without a user (e.g. from the scheduler).
+export const extractMedicalEntitiesInternal = internalAction({
   args: {
     consultationId: v.id("consultations"),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<any> => {
     // Get consultation with transcription
-    const consultation = await ctx.runQuery(api.consultations.get, {
+    const consultation = await ctx.runQuery(internal.consultations.getInternal, {
       id: args.consultationId,
     });
 
@@ -66,65 +68,40 @@ export const extractMedicalEntities = action({
     }
 
     try {
-      // Get the OpenAI API key from environment variables
-      const apiKey = process.env.OPENAI_API_KEY;
-      if (!apiKey) {
-        throw new Error("OpenAI API key not found");
-      }
-
       // Extract medical entities with retry logic
       const entities = await retryWithExponentialBackoff(async () => {
-        // Call OpenAI API to extract medical entities
-        const response = await fetch(
-          "https://api.openai.com/v1/chat/completions",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${apiKey}`,
-            },
-            body: JSON.stringify({
-              model: "gpt-4",
-              messages: [
-                {
-                  role: "system",
-                  content:
-                    "You are a medical entity extraction assistant specialized in clinical notes analysis. " +
-                    "Extract comprehensive medical entities from the transcription including detailed information about " +
-                    "conditions, medications (including dosage and frequency when mentioned), allergies, symptoms, lab results, " +
-                    "vitals, and comorbidities. Your goal is to identify all medically relevant information that could be " +
-                    "useful for matching patients with clinical trials. Provide a structured response in JSON format.",
-                },
-                {
-                  role: "user",
-                  content:
-                    "Extract medical entities from the following doctor-patient transcription. " +
-                    "Format as JSON with these keys:\n" +
-                    "- 'conditions': array of objects with 'name' (string) and 'severity' ('mild', 'moderate', or 'severe')\n" +
-                    "- 'medications': array of strings with medication names (include dosage if available)\n" +
-                    "- 'allergies': array of strings with allergy names\n" +
-                    "- 'symptoms': array of strings with symptom descriptions\n" +
-                    "- 'labResults': object with test names as keys and results as values\n" +
-                    "- 'comorbidities': array of strings with comorbidity names\n" +
-                    "- 'vitals': object with vital names as keys and values as measurements\n\n" +
-                    "The transcription is:\n\n" +
-                    consultation.transcription,
-                },
-              ],
-              response_format: { type: "json_object" },
-              temperature: 0.1, // Lower temperature for more consistent results
-              max_tokens: 2000, // Ensure enough tokens for comprehensive analysis
-            }),
-          }
-        );
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`OpenAI API error: ${response.status} ${errorText}`);
-        }
-
-        const result = await response.json();
-        return JSON.parse(result.choices[0].message.content);
+        const content = await chatCompletion({
+          messages: [
+                  {
+                    role: "system",
+                    content:
+                      "You are a medical entity extraction assistant specialized in clinical notes analysis. " +
+                      "Extract comprehensive medical entities from the transcription including detailed information about " +
+                      "conditions, medications (including dosage and frequency when mentioned), allergies, symptoms, lab results, " +
+                      "vitals, and comorbidities. Your goal is to identify all medically relevant information that could be " +
+                      "useful for matching patients with clinical trials. Provide a structured response in JSON format.",
+                  },
+                  {
+                    role: "user",
+                    content:
+                      "Extract medical entities from the following doctor-patient transcription. " +
+                      "Format as JSON with these keys:\n" +
+                      "- 'conditions': array of objects with 'name' (string) and 'severity' ('mild', 'moderate', or 'severe')\n" +
+                      "- 'medications': array of strings with medication names (include dosage if available)\n" +
+                      "- 'allergies': array of strings with allergy names\n" +
+                      "- 'symptoms': array of strings with symptom descriptions\n" +
+                      "- 'labResults': object with test names as keys and results as values\n" +
+                      "- 'comorbidities': array of strings with comorbidity names\n" +
+                      "- 'vitals': object with vital names as keys and values as measurements\n\n" +
+                      "The transcription is:\n\n" +
+                      consultation.transcription,
+                  },
+                ],
+          json: true,
+          temperature: 0.1, // Lower temperature for more consistent results
+          maxTokens: 8000,
+        });
+        return parseJsonObject(content);
       });
 
       // Validate and normalize the extracted entities
@@ -147,7 +124,7 @@ export const extractMedicalEntities = action({
           args.consultationId
         );
         enhancedAnalysis = await ctx.runAction(
-          api.asi1.enhanceMedicalAnalysis,
+          internal.asi1.enhanceMedicalAnalysisInternal,
           {
             consultationId: args.consultationId,
             extractedEntities: normalizedEntities,
@@ -171,7 +148,7 @@ export const extractMedicalEntities = action({
 
         // Use real-time ClinicalTrials.gov data for matching
         const realTimeMatches = await ctx.runAction(
-          api.clinicalTrials.findMatchingTrialsRealTime,
+          internal.clinicalTrials.findMatchingTrialsRealTimeInternal,
           {
             consultationId: args.consultationId,
             useRealTimeData: true,
@@ -188,7 +165,7 @@ export const extractMedicalEntities = action({
           };
 
           const enhancedMatches = await ctx.runAction(
-            api.asi1.analyzeTrialMatches,
+            internal.asi1.analyzeTrialMatchesInternal,
             {
               consultationId: args.consultationId,
               trialMatches: realTimeMatches.trials,
@@ -203,13 +180,19 @@ export const extractMedicalEntities = action({
           );
         }
 
-        // Also run the original trial matching for comparison
-        await ctx.runAction(api.trialMatching.runMatchingAfterExtraction, {
-          consultationId: args.consultationId,
-        });
       } catch (matchError) {
         // Log the error but don't fail the extraction process
         console.error("Error during enhanced trial matching:", matchError);
+      }
+
+      // Match against the trials in our own database. This runs even when the
+      // ClinicalTrials.gov search or ASI1 above fails, so patients still get matches.
+      try {
+        await ctx.runAction(internal.trialMatching.runMatchingAfterExtractionInternal, {
+          consultationId: args.consultationId,
+        });
+      } catch (matchError) {
+        console.error("Error during trial matching:", matchError);
       }
 
       return {
@@ -222,6 +205,16 @@ export const extractMedicalEntities = action({
         `Failed to extract medical entities: ${error instanceof Error ? error.message : String(error)}`
       );
     }
+  },
+});
+
+export const extractMedicalEntities = action({
+  args: {
+    consultationId: v.id("consultations"),
+  },
+  handler: async (ctx, args): Promise<any> => {
+    await requireDoctorAction(ctx);
+    return await ctx.runAction(internal.medicalEntityExtraction.extractMedicalEntitiesInternal, args);
   },
 });
 
@@ -253,7 +246,7 @@ function normalizeEntities(entities: any) {
   };
 
   // Normalize conditions to ensure they all have the required format
-  normalized.conditions = normalized.conditions.map((condition) => {
+  normalized.conditions = normalized.conditions.map((condition: any) => {
     if (typeof condition === "string") {
       return { name: condition, severity: "moderate" };
     } else if (typeof condition === "object" && condition !== null) {
@@ -331,66 +324,42 @@ export const extractEntitiesFromTranscription = action({
     transcription: v.string(),
   },
   handler: async (ctx, args) => {
+    await requireDoctorAction(ctx);
     try {
-      // Get the OpenAI API key from environment variables
-      const apiKey = process.env.OPENAI_API_KEY;
-      if (!apiKey) {
-        throw new Error("OpenAI API key not found");
-      }
-
       // Extract entities with retry logic
       return await retryWithExponentialBackoff(async () => {
-        // Call OpenAI API to extract medical entities
-        const response = await fetch(
-          "https://api.openai.com/v1/chat/completions",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${apiKey}`,
-            },
-            body: JSON.stringify({
-              model: "gpt-4",
-              messages: [
-                {
-                  role: "system",
-                  content:
-                    "You are a medical entity extraction assistant specialized in clinical notes analysis. " +
-                    "Extract comprehensive medical entities from the transcription including detailed information about " +
-                    "conditions, medications (including dosage and frequency when mentioned), allergies, symptoms, lab results, " +
-                    "vitals, and comorbidities. Your goal is to identify all medically relevant information that could be " +
-                    "useful for matching patients with clinical trials. Provide a structured response in JSON format.",
-                },
-                {
-                  role: "user",
-                  content:
-                    "Extract medical entities from the following doctor-patient transcription. " +
-                    "Format as JSON with these keys:\n" +
-                    "- 'conditions': array of objects with 'name' (string) and 'severity' ('mild', 'moderate', or 'severe')\n" +
-                    "- 'medications': array of strings with medication names (include dosage if available)\n" +
-                    "- 'allergies': array of strings with allergy names\n" +
-                    "- 'symptoms': array of strings with symptom descriptions\n" +
-                    "- 'labResults': object with test names as keys and results as values\n" +
-                    "- 'comorbidities': array of strings with comorbidity names\n" +
-                    "- 'vitals': object with vital names as keys and values as measurements\n\n" +
-                    "The transcription is:\n\n" +
-                    args.transcription,
-                },
-              ],
-              response_format: { type: "json_object" },
-              temperature: 0.1, // Lower temperature for more consistent results
-              max_tokens: 2000, // Ensure enough tokens for comprehensive analysis
-            }),
-          }
-        );
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`OpenAI API error: ${response.status} ${errorText}`);
-        }
-
-        const result = await response.json();
-        const entities = JSON.parse(result.choices[0].message.content);
+        const content = await chatCompletion({
+          messages: [
+                  {
+                    role: "system",
+                    content:
+                      "You are a medical entity extraction assistant specialized in clinical notes analysis. " +
+                      "Extract comprehensive medical entities from the transcription including detailed information about " +
+                      "conditions, medications (including dosage and frequency when mentioned), allergies, symptoms, lab results, " +
+                      "vitals, and comorbidities. Your goal is to identify all medically relevant information that could be " +
+                      "useful for matching patients with clinical trials. Provide a structured response in JSON format.",
+                  },
+                  {
+                    role: "user",
+                    content:
+                      "Extract medical entities from the following doctor-patient transcription. " +
+                      "Format as JSON with these keys:\n" +
+                      "- 'conditions': array of objects with 'name' (string) and 'severity' ('mild', 'moderate', or 'severe')\n" +
+                      "- 'medications': array of strings with medication names (include dosage if available)\n" +
+                      "- 'allergies': array of strings with allergy names\n" +
+                      "- 'symptoms': array of strings with symptom descriptions\n" +
+                      "- 'labResults': object with test names as keys and results as values\n" +
+                      "- 'comorbidities': array of strings with comorbidity names\n" +
+                      "- 'vitals': object with vital names as keys and values as measurements\n\n" +
+                      "The transcription is:\n\n" +
+                      args.transcription,
+                  },
+                ],
+          json: true,
+          temperature: 0.1, // Lower temperature for more consistent results
+          maxTokens: 8000,
+        });
+        const entities = parseJsonObject(content);
 
         // Normalize and validate the extracted entities
         return normalizeEntities(entities);
@@ -409,9 +378,10 @@ export const reprocessTranscription = action({
   args: {
     consultationId: v.id("consultations"),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<any> => {
+    await requireDoctorAction(ctx);
     // Get consultation with transcription
-    const consultation = await ctx.runQuery(api.consultations.get, {
+    const consultation = await ctx.runQuery(internal.consultations.getInternal, {
       id: args.consultationId,
     });
 
@@ -450,8 +420,9 @@ export const extractMedicalEntitiesWithGemini = action({
     consultationId: v.id("consultations"),
   },
   handler: async (ctx, args) => {
+    await requireDoctorAction(ctx);
     // Get consultation with transcription
-    const consultation = await ctx.runQuery(api.consultations.get, {
+    const consultation = await ctx.runQuery(internal.consultations.getInternal, {
       id: args.consultationId,
     });
 
@@ -464,16 +435,6 @@ export const extractMedicalEntitiesWithGemini = action({
     }
 
     try {
-      // Get the Google Gemini API key from environment variables
-      const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
-      if (!apiKey) {
-        throw new Error("Google Gemini API key not found");
-      }
-
-      // Initialize Google Gemini AI
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
-
       // Extract medical entities with retry logic
       const entities = await retryWithExponentialBackoff(async () => {
         const prompt = `
@@ -540,13 +501,16 @@ ${consultation.transcription}
 Please respond with only the JSON object, no additional text.
 `;
 
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text();
+        const text = await chatCompletion({
+          messages: [{ role: "user", content: prompt }],
+          json: true,
+          temperature: 0.1,
+          maxTokens: 8000,
+        });
 
         // Parse the JSON response
         try {
-          const entities = JSON.parse(text);
+          const entities = parseJsonObject(text);
           return normalizeGeminiEntities(entities);
         } catch (parseError) {
           console.error("Error parsing Gemini response:", parseError);
@@ -575,7 +539,7 @@ Please respond with only the JSON object, no additional text.
           "Triggering trial matching for consultation:",
           args.consultationId
         );
-        await ctx.runAction(api.trialMatching.runMatchingAfterExtraction, {
+        await ctx.runAction(internal.trialMatching.runMatchingAfterExtractionInternal, {
           consultationId: args.consultationId,
         });
       } catch (matchError) {

@@ -1,5 +1,6 @@
 import { v } from "convex/values";
-import { mutation, query, action, internalMutation } from "./_generated/server";
+import { mutation, query, action, internalMutation, internalQuery, internalAction } from "./_generated/server";
+import { canAccessAudioRecording, canAccessConsultationAudio, requireDoctor } from "./authz";
 import { api, internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
 import { ConvexError } from "convex/values";
@@ -8,6 +9,7 @@ import { ConvexError } from "convex/values";
 export const generateUploadUrl = mutation({
   args: {},
   handler: async (ctx) => {
+    await requireDoctor(ctx);
     // Generate a URL for uploading
     return await ctx.storage.generateUploadUrl();
   },
@@ -24,6 +26,7 @@ export const storeAudioRecording = mutation({
     duration: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    await requireDoctor(ctx);
     // Ensure the consultation exists
     const consultation = await ctx.db.get(args.consultationId);
     if (!consultation) {
@@ -64,6 +67,17 @@ export const getAudioRecording = query({
     audioRecordingId: v.id("audioRecordings"),
   },
   handler: async (ctx, args) => {
+    if (!(await canAccessAudioRecording(ctx, args.audioRecordingId))) return null;
+    return await ctx.db.get(args.audioRecordingId);
+  },
+});
+
+// Same as `getAudioRecording`, without access checks, for server-side callers.
+export const getAudioRecordingInternal = internalQuery({
+  args: {
+    audioRecordingId: v.id("audioRecordings"),
+  },
+  handler: async (ctx, args) => {
     return await ctx.db.get(args.audioRecordingId);
   },
 });
@@ -74,6 +88,7 @@ export const getAudioRecordingsForConsultation = query({
     consultationId: v.id("consultations"),
   },
   handler: async (ctx, args) => {
+    if (!(await canAccessConsultationAudio(ctx, args.consultationId))) return [];
     return await ctx.db
       .query("audioRecordings")
       .withIndex("by_consultation", (q) =>
@@ -85,6 +100,22 @@ export const getAudioRecordingsForConsultation = query({
 
 // Generate a URL for downloading audio
 export const generateAudioUrl = query({
+  args: {
+    audioRecordingId: v.id("audioRecordings"),
+  },
+  handler: async (ctx, args) => {
+    if (!(await canAccessAudioRecording(ctx, args.audioRecordingId))) return null;
+    const audioRecording = await ctx.db.get(args.audioRecordingId);
+    if (!audioRecording) {
+      throw new ConvexError("Audio recording not found");
+    }
+
+    return await ctx.storage.getUrl(audioRecording.fileId);
+  },
+});
+
+// Same as `generateAudioUrl`, without access checks, for server-side callers.
+export const generateAudioUrlInternal = internalQuery({
   args: {
     audioRecordingId: v.id("audioRecordings"),
   },
@@ -118,20 +149,20 @@ export const transcribeAudio = internalMutation({
 
     // Schedule the action to perform the actual transcription
     // This is done in an action because it requires calling external APIs
-    await ctx.scheduler.runAfter(0, api.audio.performTranscription, {
+    await ctx.scheduler.runAfter(0, internal.audio.performTranscription, {
       audioRecordingId: args.audioRecordingId,
     });
   },
 });
 
 // Action to perform the actual transcription using Groq Whisper API
-export const performTranscription = action({
+export const performTranscription = internalAction({
   args: {
     audioRecordingId: v.id("audioRecordings"),
   },
   handler: async (ctx, args) => {
     // Get the audio recording
-    const audioRecording = await ctx.runQuery(api.audio.getAudioRecording, {
+    const audioRecording = await ctx.runQuery(internal.audio.getAudioRecordingInternal, {
       audioRecordingId: args.audioRecordingId,
     });
 
@@ -141,7 +172,7 @@ export const performTranscription = action({
 
     try {
       // Get the audio URL
-      const audioUrl = await ctx.runQuery(api.audio.generateAudioUrl, {
+      const audioUrl = await ctx.runQuery(internal.audio.generateAudioUrlInternal, {
         audioRecordingId: args.audioRecordingId,
       });
 
@@ -230,7 +261,7 @@ export const updateTranscription = internalMutation({
       // Trigger medical entity extraction
       await ctx.scheduler.runAfter(
         0,
-        api.medicalEntityExtraction.extractMedicalEntities,
+        internal.medicalEntityExtraction.extractMedicalEntitiesInternal,
         {
           consultationId: audioRecording.consultationId,
         }

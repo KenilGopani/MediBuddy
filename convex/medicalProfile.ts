@@ -1,10 +1,12 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { canAccessPatient, requirePatientAccess } from "./authz";
 
 // Get medical profile for a patient
 export const getMedicalProfile = query({
   args: { patientId: v.id("users") },
   handler: async (ctx, args) => {
+    if (!(await canAccessPatient(ctx, args.patientId))) return null;
     const user = await ctx.db.get(args.patientId);
     if (!user || user.role !== "patient") {
       throw new Error("Patient not found");
@@ -64,6 +66,7 @@ export const updateMedicalProfile = mutation({
     }),
   },
   handler: async (ctx, args) => {
+    await requirePatientAccess(ctx, args.patientId);
     const user = await ctx.db.get(args.patientId);
     if (!user || user.role !== "patient") {
       throw new Error("Patient not found");
@@ -96,12 +99,13 @@ export const updateMedicalProfile = mutation({
 export const isProfileComplete = query({
   args: { patientId: v.id("users") },
   handler: async (ctx, args) => {
+    if (!(await canAccessPatient(ctx, args.patientId))) return false;
     const user = await ctx.db.get(args.patientId);
     if (!user || user.role !== "patient") {
       return false;
     }
 
-    const profile = user.medicalProfile;
+    const profile = user.medicalProfile as Record<string, any> | undefined;
     if (!profile) return false;
 
     // Check required fields for clinical trial matching
@@ -127,12 +131,13 @@ export const isProfileComplete = query({
 export const getProfileCompletionPercentage = query({
   args: { patientId: v.id("users") },
   handler: async (ctx, args) => {
+    if (!(await canAccessPatient(ctx, args.patientId))) return 0;
     const user = await ctx.db.get(args.patientId);
     if (!user || user.role !== "patient") {
       return 0;
     }
 
-    const profile = user.medicalProfile;
+    const profile = user.medicalProfile as Record<string, any> | undefined;
     if (!profile) return 0;
 
     const allFields = [

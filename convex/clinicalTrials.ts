@@ -1,5 +1,6 @@
 import { v } from "convex/values";
-import { action, internalMutation, mutation, query } from "./_generated/server";
+import { action, internalMutation, mutation, query, internalAction } from "./_generated/server";
+import { canAccessConsultation, requireDoctor, requireDoctorAction, requireUserAction } from "./authz";
 import { api, internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import { ConvexError } from "convex/values";
@@ -338,7 +339,8 @@ function mapStudyToTrial(study: ClinicalTrialStudy): MappedClinicalTrial {
 /**
  * Search clinical trials from ClinicalTrials.gov API
  */
-export const searchClinicalTrials = action({
+// Server-side implementation; runs without a user (e.g. from the scheduler).
+export const searchClinicalTrialsInternal = internalAction({
   args: {
     searchParams: v.object({
       conditions: v.array(v.string()),
@@ -494,6 +496,37 @@ export const searchClinicalTrials = action({
   },
 });
 
+export const searchClinicalTrials = action({
+  args: {
+    searchParams: v.object({
+      conditions: v.array(v.string()),
+      ageRange: v.optional(
+        v.object({
+          min: v.number(),
+          max: v.number(),
+        })
+      ),
+      gender: v.optional(v.string()),
+      location: v.optional(v.string()),
+      status: v.optional(
+        v.union(
+          v.literal("recruiting"),
+          v.literal("active"),
+          v.literal("completed"),
+          v.literal("not_yet_recruiting")
+        )
+      ),
+      phase: v.optional(v.array(v.string())),
+      studyType: v.optional(v.string()),
+      maxResults: v.optional(v.number()),
+    }),
+  },
+  handler: async (ctx, args): Promise<any> => {
+    await requireUserAction(ctx);
+    return await ctx.runAction(internal.clinicalTrials.searchClinicalTrialsInternal, args);
+  },
+});
+
 /**
  * Get detailed information about a specific trial by NCT ID
  */
@@ -502,6 +535,7 @@ export const getTrialDetails = action({
     nctId: v.string(),
   },
   handler: async (ctx, args) => {
+    await requireUserAction(ctx);
     try {
       // Check rate limiting
       if (!checkRateLimit()) {
@@ -527,11 +561,13 @@ export const getTrialDetails = action({
 
       const data = await response.json();
 
-      if (!data.studies || data.studies.length === 0) {
+      // /studies/{nctId} returns the study object itself, not a `studies` list
+      const study = data.studies?.[0] ?? (data.protocolSection ? data : null);
+      if (!study) {
         throw new ConvexError(`Trial with NCT ID ${args.nctId} not found`);
       }
 
-      const mappedTrial = mapStudyToTrial(data.studies[0]);
+      const mappedTrial = mapStudyToTrial(study);
 
       return mappedTrial;
     } catch (error) {
@@ -548,15 +584,16 @@ export const getTrialDetails = action({
 /**
  * Enhanced trial matching with real-time ClinicalTrials.gov data
  */
-export const findMatchingTrialsRealTime = action({
+// Server-side implementation; runs without a user (e.g. from the scheduler).
+export const findMatchingTrialsRealTimeInternal = internalAction({
   args: {
     consultationId: v.id("consultations"),
     useRealTimeData: v.optional(v.boolean()),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<any> => {
     try {
       // Get consultation data
-      const consultation = await ctx.runQuery(api.consultations.get, {
+      const consultation = await ctx.runQuery(internal.consultations.getInternal, {
         id: args.consultationId,
       });
 
@@ -567,7 +604,7 @@ export const findMatchingTrialsRealTime = action({
       }
 
       // Get patient data
-      const patient = await ctx.runQuery(api.users.getById, {
+      const patient = await ctx.runQuery(internal.users.getByIdInternal, {
         id: consultation.patientId,
       });
 
@@ -586,7 +623,7 @@ export const findMatchingTrialsRealTime = action({
         consultation.structuredData.conditions?.length > 0
       ) {
         // Use structured data if available
-        conditions = consultation.structuredData.conditions.map((c) => c.name);
+        conditions = consultation.structuredData.conditions.map((c: any) => c.name);
         dataSource = "structured medical entities";
       } else if (consultation.transcription) {
         // Fall back to extracting conditions from transcription
@@ -624,26 +661,26 @@ export const findMatchingTrialsRealTime = action({
       };
 
       // Search real-time data from ClinicalTrials.gov
-      const realTimeResults = await ctx.runAction(
-        api.clinicalTrials.searchClinicalTrials,
+      const realTimeResults: any = await ctx.runAction(
+        internal.clinicalTrials.searchClinicalTrialsInternal,
         {
           searchParams,
         }
       );
 
       // Also get existing local trials for comparison
-      const localTrials = await ctx.runQuery(
-        api.trialMatching.listActiveTrials,
+      const localTrials: any = await ctx.runQuery(
+        internal.trialMatching.listActiveTrialsInternal,
         {}
       );
 
       // Combine and deduplicate results
-      const combinedTrials = [...realTimeResults.trials];
+      const combinedTrials: any[] = [...realTimeResults.trials];
 
       // Add local trials that aren't already in real-time results
       for (const localTrial of localTrials) {
         const existsInRealTime = realTimeResults.trials.some(
-          (rt) => rt.nctId && localTrial.title.includes(rt.nctId)
+          (rt: any) => rt.nctId && localTrial.title.includes(rt.nctId)
         );
 
         if (!existsInRealTime) {
@@ -691,6 +728,17 @@ export const findMatchingTrialsRealTime = action({
   },
 });
 
+export const findMatchingTrialsRealTime = action({
+  args: {
+    consultationId: v.id("consultations"),
+    useRealTimeData: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args): Promise<any> => {
+    await requireDoctorAction(ctx);
+    return await ctx.runAction(internal.clinicalTrials.findMatchingTrialsRealTimeInternal, args);
+  },
+});
+
 /**
  * Save a trial to the database from search results
  */
@@ -724,6 +772,7 @@ export const saveTrial = mutation({
     endDate: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    await requireDoctor(ctx);
     try {
       // Check if trial already exists by nctId
       const existingTrial = await ctx.db
@@ -786,6 +835,7 @@ export const saveTrialSearchResults = mutation({
     ),
   },
   handler: async (ctx, args) => {
+    await requireDoctor(ctx);
     try {
       const savedTrialIds: Id<"clinicalTrials">[] = [];
       const matchIds: Id<"trialMatches">[] = [];
@@ -881,6 +931,7 @@ export const saveTrialSearchResults = mutation({
 export const clearTrialCache = action({
   args: {},
   handler: async (ctx, args) => {
+    await requireDoctorAction(ctx);
     // In a real implementation, this would clear Redis cache
     // For now, we'll just reset the rate limiting state
     rateLimitState.requests = [];
@@ -896,6 +947,7 @@ export const clearTrialCache = action({
 export const getApiStats = action({
   args: {},
   handler: async (ctx, args) => {
+    await requireUserAction(ctx);
     const now = Date.now();
     const oneMinuteAgo = now - 60000;
     const recentRequests = rateLimitState.requests.filter(
@@ -920,6 +972,7 @@ export const getSavedTrialsForConsultation = query({
     consultationId: v.id("consultations"),
   },
   handler: async (ctx, args) => {
+    if (!(await canAccessConsultation(ctx, args.consultationId))) return [];
     try {
       // Get trial matches for this consultation
       const matches = await ctx.db

@@ -49,7 +49,7 @@ export function Navbar() {
   const createOrUpdateUser = useMutation(api.users.createOrUpdateUser);
   useEffect(() => {
     if (user) {
-      createOrUpdateUser();
+      createOrUpdateUser({});
     }
   }, [user, createOrUpdateUser]);
 

@@ -41,6 +41,8 @@ export default defineSchema({
     tokenIdentifier: v.optional(v.string()),
     clerkId: v.optional(v.string()),
     role: v.union(v.literal("doctor"), v.literal("patient")),
+    // Set once the user picks a role on the role selection page; new accounts default to "patient" until then
+    roleConfirmed: v.optional(v.boolean()),
 
     // Doctor-specific fields
     specialization: v.optional(v.string()),

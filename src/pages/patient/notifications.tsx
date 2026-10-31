@@ -3,6 +3,7 @@ import { useUser } from "@clerk/clerk-react";
 import { useQuery, useMutation, useConvex } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Id } from "../../../convex/_generated/dataModel";
+import { Link } from "react-router-dom";
 import {
   getPatientAgent,
   getPatientNotificationsWithAgent,
@@ -745,17 +746,21 @@ export default function PatientNotifications() {
                       </div>
                     )}
 
-                    {selectedNotification.consentStatus === "pending" &&
-                      selectedNotification.type === "consent_required" && (
+                    {selectedNotification.consentStatus === "pending" && (
                         <div className="pt-4 border-t">
                           <div className="space-y-3">
                             <p className="text-sm text-muted-foreground">
                               Please review the informed consent document before
                               proceeding.
                             </p>
-                            <Button className="w-full bg-primary hover:bg-primary/90">
-                              <FileText className="h-4 w-4 mr-2" />
-                              Review Consent Form
+                            <Button
+                              asChild
+                              className="w-full bg-primary hover:bg-primary/90"
+                            >
+                              <Link to="/patient/consent">
+                                <FileText className="h-4 w-4 mr-2" />
+                                Review Consent Form
+                              </Link>
                             </Button>
                           </div>
                         </div>

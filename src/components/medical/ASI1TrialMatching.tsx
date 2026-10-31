@@ -145,8 +145,8 @@ export function ASI1TrialMatching({
   const searchRealTimeTrials = useAction(
     api.clinicalTrials.findMatchingTrialsRealTime
   );
-  const enhanceWithASI1 = useMutation(api.asi1.enhanceMedicalAnalysis);
-  const analyzeTrials = useMutation(api.asi1.analyzeTrialMatches);
+  const enhanceWithASI1 = useAction(api.asi1.enhanceMedicalAnalysis);
+  const analyzeTrials = useAction(api.asi1.analyzeTrialMatches);
   const saveTrialResults = useMutation(
     api.clinicalTrials.saveTrialSearchResults
   );

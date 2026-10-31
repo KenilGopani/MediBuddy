@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import MedicalReportDisplay from "@/components/medical/MedicalReportDisplay";
 import MedicalEntityExtraction from "@/components/medical/MedicalEntityExtraction";
+import ConsultationAudioPlayer from "@/components/audio/ConsultationAudioPlayer";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { Badge } from "@/components/ui/badge";
 
@@ -201,6 +202,14 @@ export default function PatientConsultation() {
             </div>
           ) : (
             <>
+              {consultationId && (
+                <div className="mb-6">
+                  <ConsultationAudioPlayer
+                    consultationId={consultationId as Id<"consultations">}
+                  />
+                </div>
+              )}
+
               {/* Tabs */}
               <Tabs defaultValue="medical-report" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 mb-8">

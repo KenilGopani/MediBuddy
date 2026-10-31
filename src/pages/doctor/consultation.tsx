@@ -51,6 +51,13 @@ export default function DoctorConsultation() {
     consultationId ? { id: consultationId as Id<"consultations"> } : "skip"
   );
 
+  // Patients to choose from when the consultation was started without one
+  const needsPatient = !consultationId && !urlPatientId;
+  const allPatients = useQuery(
+    api.users.getAllPatients,
+    needsPatient ? {} : "skip"
+  );
+
   // Fetch patient data
   const patient = useQuery(
     api.users.getById,
@@ -66,21 +73,12 @@ export default function DoctorConsultation() {
   // Initialize consultation if needed
   useEffect(() => {
     const initializeConsultation = async () => {
-      if (!consultationId && user && currentUser) {
+      // Without a patient the page shows a patient picker instead
+      if (!consultationId && urlPatientId && user && currentUser) {
         try {
           // Use the current user's Convex document ID as the doctor
           const doctorId = currentUser._id;
-
-          // For patient ID, we need to handle different cases:
-          let targetPatientId: Id<"users">;
-
-          if (urlPatientId) {
-            // If patient ID is provided in URL, use it directly (assuming it's already a Convex ID)
-            targetPatientId = urlPatientId as Id<"users">;
-          } else {
-            // Otherwise, use the current user as both doctor and patient (for testing)
-            targetPatientId = currentUser._id;
-          }
+          const targetPatientId = urlPatientId as Id<"users">;
 
           const newConsultationId = await createOrGetConsultation({
             doctorId,
@@ -210,7 +208,61 @@ export default function DoctorConsultation() {
   const appointmentStatus =
     meeting?.status ||
     (consultation?.status === "completed" ? "completed" : "scheduled");
-  const patientName = patient?.name || "Darshan Arunbhai Patel"; // Fallback to sample name
+  const patientName = patient?.name || "Patient";
+
+  if (needsPatient) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background">
+        <Navbar />
+        <main className="flex-grow">
+          <div className="container mx-auto px-4 py-10 max-w-2xl">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate("/doctor/dashboard")}
+              className="text-muted-foreground hover:text-foreground mb-6"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Dashboard
+            </Button>
+            <h1 className="text-3xl font-extrabold mb-2">Start a consultation</h1>
+            <p className="text-muted-foreground mb-6">
+              Choose the patient you are seeing.
+            </p>
+            {allPatients === undefined ? (
+              <LoadingSpinner className="h-6 w-6 text-primary" />
+            ) : allPatients.length === 0 ? (
+              <p className="text-muted-foreground">
+                No patients have signed up yet.
+              </p>
+            ) : (
+              <ul className="space-y-2">
+                {allPatients.map((p) => (
+                  <li key={p._id}>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        navigate(`/doctor/consultation?patientId=${p._id}`)
+                      }
+                      className="w-full text-left rounded-xl border border-border bg-card px-4 py-3 hover:border-primary transition-colors"
+                    >
+                      <span className="font-bold">{p.name || "Unnamed patient"}</span>
+                      <span className="block text-sm text-muted-foreground">
+                        {[p.age && `Age ${p.age}`, p.gender, p.location]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
